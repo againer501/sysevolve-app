@@ -3,20 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sysevolve Test</title>
+    <title>Sysevolve - Тестирование</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f4f7f6; }
-        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-        .error { color: #d9534f; }
-        button { background: #28a745; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+        :root { --primary-color: #007bff; --bg-color: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #app { width: 100%; max-width: 600px; padding: 20px; }
+        .card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--primary-color); margin-bottom: 30px; letter-spacing: 1px; }
+        .progress-bar { height: 6px; background: #eee; border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
+        .progress-inner { height: 100%; background: var(--primary-color); transition: width 0.3s ease; }
+        h2 { font-size: 20px; color: #333; margin-bottom: 25px; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn { background: white; border: 2px solid #eee; padding: 15px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 16px; text-align: left; }
+        .option-btn:hover { border-color: var(--primary-color); background: #f0f7ff; }
+        .error { color: #dc3545; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div id="app">
     <div class="card">
-        <h3>Загрузка системы...</h3>
-        <p>Пожалуйста, подождите.</p>
+        <div class="loader"></div>
+        <p>Загрузка теста...</p>
     </div>
 </div>
 
@@ -36,43 +46,98 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function start() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const display = document.getElementById('app');
+    // --- НАСТРОЙКА ВОПРОСОВ (Возьмите их из скриншотов) ---
+    const quizData = [
+        {
+            question: "Вопрос 1: Как вы оцениваете эффективность текущих процессов?",
+            options: ["Высокая", "Средняя", "Низкая", "Затрудняюсь ответить"]
+        },
+        {
+            question: "Вопрос 2: Укажите ваш приоритет развития на текущий год.",
+            options: ["Масштабирование", "Оптимизация затрат", "Цифровизация", "Обучение персонала"]
+        }
+        // Сюда добавьте остальные вопросы по образцу
+    ];
 
-        if (!token) {
-            display.innerHTML = '<div class="card"><h2 class="error">Ошибка</h2><p>Токен не найден в ссылке.</p></div>';
+    let currentStep = 0;
+    let answers = {};
+    let userToken = "";
+    const display = document.getElementById('app');
+
+    async function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        userToken = urlParams.get('token');
+
+        if (!userToken) {
+            renderError("Доступ запрещен. Ссылка не содержит токен.");
             return;
         }
 
         try {
-            const docRef = doc(db, "tokens", token);
-            const docSnap = await getDoc(docRef);
-
+            const docSnap = await getDoc(doc(db, "tokens", userToken));
             if (!docSnap.exists()) {
-                display.innerHTML = `<div class="card"><h2 class="error">Ошибка</h2><p>Токен <b>${token}</b> не найден в базе.</p></div>`;
-            } else if (docSnap.data().used === true) {
-                display.innerHTML = '<div class="card"><h2>Тест завершен</h2><p>Эта ссылка была использована ранее.</p></div>';
+                renderError("Невалидная ссылка.");
+            } else if (docSnap.data().used) {
+                renderError("Этот тест уже был пройден.");
             } else {
-                display.innerHTML = `
-                    <div class="card">
-                        <h2>Привет, ${docSnap.data().name}!</h2>
-                        <p>Нажмите кнопку ниже, чтобы отправить тестовое подтверждение в базу Sysevolve.</p>
-                        <button id="finishBtn">Отправить результат</button>
-                    </div>`;
-                
-                document.getElementById('finishBtn').onclick = async () => {
-                    await updateDoc(docRef, { used: true, finishedAt: new Date().toISOString() });
-                    display.innerHTML = '<div class="card"><h2>Готово!</h2><p>Данные успешно сохранены.</p></div>';
-                };
+                renderStep();
             }
         } catch (e) {
-            display.innerHTML = `<div class="card"><h2 class="error">Ошибка Firebase</h2><p>${e.message}</p></div>`;
+            renderError("Ошибка связи с базой.");
         }
     }
 
-    start();
+    function renderStep() {
+        const progress = (currentStep / quizData.length) * 100;
+        const q = quizData[currentStep];
+
+        display.innerHTML = `
+            <div class="card">
+                <div class="logo">SYSEVOLVE</div>
+                <div class="progress-bar"><div class="progress-inner" style="width: ${progress}%"></div></div>
+                <h2>${q.question}</h2>
+                <div class="options">
+                    ${q.options.map(opt => `<button class="option-btn" onclick="next('${opt}')">${opt}</button>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    window.next = async (answer) => {
+        answers[`q${currentStep + 1}`] = answer;
+        currentStep++;
+
+        if (currentStep < quizData.length) {
+            renderStep();
+        } else {
+            complete();
+        }
+    };
+
+    async function complete() {
+        display.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение результатов...</p></div>';
+        try {
+            await updateDoc(doc(db, "tokens", userToken), {
+                results: answers,
+                used: true,
+                finishedAt: new Date().toISOString()
+            });
+            display.innerHTML = `
+                <div class="card">
+                    <div class="logo" style="color: #28a745;">УСПЕШНО</div>
+                    <h2>Благодарим за прохождение!</h2>
+                    <p>Ваши ответы переданы экспертам Sysevolve.</p>
+                </div>`;
+        } catch (e) {
+            renderError("Ошибка при сохранении.");
+        }
+    }
+
+    function renderError(msg) {
+        display.innerHTML = `<div class="card"><h2 class="error">⚠ Ошибка</h2><p>${msg}</p></div>`;
+    }
+
+    init();
 </script>
 
 </body>
