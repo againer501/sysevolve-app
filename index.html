@@ -1,10 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sysevolve Test</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f4f7f6; }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+        .error { color: #d9534f; }
+        button { background: #28a745; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+    </style>
 </head>
 <body>
+
+<div id="app">
+    <div class="card">
+        <h3>Загрузка системы...</h3>
+        <p>Пожалуйста, подождите.</p>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -22,15 +36,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Скрываем интерфейс пока идет проверка
-    document.body.innerHTML = '<div id="loader" style="text-align:center; margin-top:100px;">Проверка доступа...</div>';
-
-    window.onload = async function() {
+    async function start() {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
+        const display = document.getElementById('app');
 
         if (!token) {
-            showError("Доступ запрещен. Используйте персональную ссылку.");
+            display.innerHTML = '<div class="card"><h2 class="error">Ошибка</h2><p>Токен не найден в ссылке.</p></div>';
             return;
         }
 
@@ -39,52 +51,28 @@
             const docSnap = await getDoc(docRef);
 
             if (!docSnap.exists()) {
-                showError("Ссылка недействительна.");
+                display.innerHTML = `<div class="card"><h2 class="error">Ошибка</h2><p>Токен <b>${token}</b> не найден в базе.</p></div>`;
             } else if (docSnap.data().used === true) {
-                showError("Этот тест уже был пройден ранее.");
+                display.innerHTML = '<div class="card"><h2>Тест завершен</h2><p>Эта ссылка была использована ранее.</p></div>';
             } else {
-                window.userToken = token;
-                // Показываем тест только если токен ок
-                showTestUI(docSnap.data().name);
+                display.innerHTML = `
+                    <div class="card">
+                        <h2>Привет, ${docSnap.data().name}!</h2>
+                        <p>Нажмите кнопку ниже, чтобы отправить тестовое подтверждение в базу Sysevolve.</p>
+                        <button id="finishBtn">Отправить результат</button>
+                    </div>`;
+                
+                document.getElementById('finishBtn').onclick = async () => {
+                    await updateDoc(docRef, { used: true, finishedAt: new Date().toISOString() });
+                    display.innerHTML = '<div class="card"><h2>Готово!</h2><p>Данные успешно сохранены.</p></div>';
+                };
             }
         } catch (e) {
-            console.error(e);
-            showError("Ошибка подключения к облаку.");
+            display.innerHTML = `<div class="card"><h2 class="error">Ошибка Firebase</h2><p>${e.message}</p></div>`;
         }
-    };
-
-    window.finishTest = async function(answers) {
-        try {
-            const docRef = doc(db, "tokens", window.userToken);
-            await updateDoc(docRef, {
-                results: answers,
-                used: true,
-                finishedAt: new Date().toISOString()
-            });
-            document.body.innerHTML = "<h1 style='text-align:center; padding:50px; font-family:sans-serif;'>Тест завершен. Спасибо!</h1>";
-        } catch (error) {
-            alert("Ошибка сохранения.");
-        }
-    };
-
-    function showTestUI(userName) {
-        document.body.innerHTML = `
-            <div style="max-width: 500px; margin: 50px auto; font-family: sans-serif; text-align: center; border: 1px solid #ddd; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <h2 style="color: #007bff;">Здравствуйте, ${userName}!</h2>
-                <p>Система Sysevolve готова к работе. Нажмите кнопку ниже для завершения проверки.</p>
-                <button onclick="window.finishTest({'status': 'verified'})" style="background-color: #28a745; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer;">
-                    Отправить результат
-                </button>
-            </div>`;
     }
 
-    function showError(msg) {
-        document.body.innerHTML = `
-            <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
-                <h1 style="color:red;">⚠</h1>
-                <h2>${msg}</h2>
-            </div>`;
-    }
+    start();
 </script>
 
 </body>
