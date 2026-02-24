@@ -3,33 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sysevolve | Регистрация PPA</title>
+    <title>Sysevolve | Профильный анализ личности</title>
     <style>
         :root { --primary: #244381; --secondary: #8DC53F; --bg: #f4f7f6; --text: #1e293b; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 600px; padding: 20px; }
-        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: left; }
+        .container { width: 100%; max-width: 650px; padding: 20px; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .logo { font-size: 26px; font-weight: 800; color: var(--primary); text-align: center; margin-bottom: 25px; letter-spacing: 2px; }
-        h2 { text-align: center; font-size: 20px; margin-bottom: 30px; color: var(--primary); }
+        h2 { text-align: center; font-size: 22px; margin-bottom: 20px; color: var(--primary); }
         
         /* Стили формы */
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
         label span { color: #dc3545; }
-        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(36,67,129,0.1); }
+        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         
-        .instruction-box { background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 5px solid var(--secondary); margin-bottom: 30px; }
-        
-        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; margin-top: 10px; }
-        .btn-main:hover { opacity: 0.9; }
+        /* Стили текста инструкции */
+        .instruction-text { line-height: 1.6; font-size: 15px; color: #334155; }
+        .instruction-text p { margin-bottom: 15px; }
+        .instruction-text ul { padding-left: 20px; margin-bottom: 20px; }
+        .instruction-text li { margin-bottom: 8px; }
+
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-main:hover { background: #1a3261; }
 
         /* Тестовая часть */
         .progress-container { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 25px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
         .word-grid { display: grid; gap: 10px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; }
-        .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-weight: bold; }
+        .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-weight: bold; font-size: 18px; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         
@@ -40,7 +43,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card" style="text-align:center;"><div class="loader"></div><p>Проверка доступа...</p></div>
+    <div class="card" style="text-align:center;"><div class="loader"></div><p>Загрузка системы...</p></div>
 </div>
 
 <script type="module">
@@ -95,52 +98,36 @@
     async function init() {
         const params = new URLSearchParams(window.location.search);
         userToken = params.get('token');
-        if (!userToken) return showError("Токен не найден.");
+        if (!userToken) return showError("Токен отсутствует.");
 
         try {
             const snap = await getDoc(doc(db, "tokens", userToken));
-            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна или уже использована.");
+            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
             renderForm(snap.data().name);
-        } catch (e) { showError("Ошибка связи."); }
+        } catch (e) { showError("Ошибка сети."); }
     }
 
-    // --- ЭКРАН 1: ФОРМА ДАННЫХ ---
+    // --- ЭКРАН 1: РЕГИСТРАЦИЯ ---
     function renderForm(dbName) {
         appDiv.innerHTML = `
             <div class="card">
                 <div class="logo">SYSEVOLVE</div>
-                <h2>Регистрация участника</h2>
+                <h2>Регистрация</h2>
                 <form id="reg-form">
-                    <div class="form-group">
-                        <label>Имя <span>*</span></label>
-                        <input type="text" id="f-name" value="${dbName}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Фамилия <span>*</span></label>
-                        <input type="text" id="f-surname" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email <span>*</span></label>
-                        <input type="email" id="f-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Название компании</label>
-                        <input type="text" id="f-company">
-                    </div>
-                    <div class="form-group">
-                        <label>Должность</label>
-                        <input type="text" id="f-position">
-                    </div>
+                    <div class="form-group"><label>Имя <span>*</span></label><input type="text" id="f-name" value="${dbName}" required></div>
+                    <div class="form-group"><label>Фамилия <span>*</span></label><input type="text" id="f-surname" required></div>
+                    <div class="form-group"><label>Электронная почта <span>*</span></label><input type="email" id="f-email" required></div>
+                    <div class="form-group"><label>Название организации</label><input type="text" id="f-company"></div>
+                    <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
                     <button type="submit" class="btn-main">Продолжить</button>
                 </form>
             </div>
         `;
-
         document.getElementById('reg-form').onsubmit = (e) => {
             e.preventDefault();
             userData = {
-                firstName: document.getElementById('f-name').value,
-                lastName: document.getElementById('f-surname').value,
+                name: document.getElementById('f-name').value,
+                surname: document.getElementById('f-surname').value,
                 email: document.getElementById('f-email').value,
                 company: document.getElementById('f-company').value,
                 position: document.getElementById('f-position').value
@@ -149,21 +136,21 @@
         };
     }
 
-    // --- ЭКРАН 2: ИНСТРУКЦИЯ ---
+    // --- ЭКРАН 2: ЭТАЛОННАЯ ИНСТРУКЦИЯ ---
     function renderInstruction() {
         appDiv.innerHTML = `
             <div class="card">
                 <div class="logo">SYSEVOLVE</div>
-                <h2>Инструкция PPA</h2>
-                <div class="instruction-box">
-                    <p>Здравствуйте, <b>${userData.firstName}</b>!</p>
-                    <p>Этот анализ определяет ваш рабочий стиль поведения. Пожалуйста:</p>
+                <h2>Профильный анализ личности</h2>
+                <div class="instruction-text">
+                    <p>Это не тест на интеллект или способности, здесь нет правильных или неправильных ответов.</p>
+                    <p>Вам будет предложено 24 группы слов. Из каждой группы выберите <b>одно</b> слово, которое лучше всего описывает ваше поведение на работе (+), и <b>одно</b> слово, которое подходит вам меньше всего (-).</p>
                     <ul>
-                        <li>В каждой группе выберите <b>один (+)</b> — что больше всего похоже на вас.</li>
-                        <li>И <b>один (-)</b> — что меньше всего похоже на вас.</li>
-                        <li>Оценивайте себя в контексте <b>рабочего поведения</b>.</li>
-                        <li>Отвечайте быстро, первая реакция — самая верная.</li>
+                        <li>Оценивайте себя только в рабочей ситуации.</li>
+                        <li>В каждой группе должен быть выбран один плюс и один минус.</li>
+                        <li>Не раздумывайте долго — первая реакция обычно самая точная.</li>
                     </ul>
+                    <p>Заполнение анкеты займет около 8 минут. Пожалуйста, убедитесь, что вас ничто не отвлекает.</p>
                 </div>
                 <button class="btn-main" onclick="window.startQuiz()">Начать тестирование</button>
             </div>
@@ -183,8 +170,8 @@
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
-                            <span class="word-text">${opt.t}</span>
-                            <div style="display:flex; gap:8px;">
+                            <span style="font-weight:600;">${opt.t}</span>
+                            <div style="display:flex; gap:10px;">
                                 <button class="btn-choice plus" id="p-${i}" onclick="select(${i}, 'plus')">+</button>
                                 <button class="btn-choice minus" id="m-${i}" onclick="select(${i}, 'minus')">-</button>
                             </div>
@@ -192,7 +179,7 @@
                     `).join('')}
                 </div>
                 <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:14px; color:#64748b;">Группа ${currentIdx+1}/${questions.length}</span>
+                    <span style="font-size:13px; color:#64748b;">Группа ${currentIdx+1} из ${questions.length}</span>
                     <button id="next-btn" class="btn-main" style="width:auto; padding:10px 30px; margin:0;" disabled onclick="window.goNext()">Далее</button>
                 </div>
             </div>
@@ -212,29 +199,37 @@
 
     window.goNext = () => {
         currentIdx++;
-        if(currentIdx < questions.length) renderQuiz();
+        if (currentIdx < questions.length) renderQuiz();
         else finish();
     };
 
     async function finish() {
         appDiv.innerHTML = '<div class="card" style="text-align:center;"><div class="loader"></div><p>Сохранение результатов...</p></div>';
+        
+        // Расчет DISC (Graph III - Self Image)
         const scores = choices.reduce((acc, curr) => {
             acc[curr.plus]++;
             acc[curr.minus]--;
             return acc;
         }, { D: 0, I: 0, S: 0, C: 0 });
 
-        await updateDoc(doc(db, "tokens", userToken), { 
-            results: scores, 
-            userDetails: userData,
-            used: true, 
-            finishedAt: new Date().toISOString() 
-        });
-        
-        appDiv.innerHTML = `<div class="card" style="text-align:center;"><div class="logo">SYSEVOLVE</div><h2>Готово!</h2><p>Данные успешно отправлены экспертам Sysevolve.</p></div>`;
+        try {
+            await updateDoc(doc(db, "tokens", userToken), { 
+                results: scores, 
+                userDetails: userData,
+                used: true, 
+                finishedAt: new Date().toISOString() 
+            });
+            appDiv.innerHTML = `
+                <div class="card" style="text-align:center;">
+                    <div class="logo" style="color:var(--secondary);">УСПЕШНО</div>
+                    <h2>Тестирование завершено</h2>
+                    <p>Благодарим за участие, ${userData.name}. Ваши данные успешно переданы экспертам Sysevolve.</p>
+                </div>`;
+        } catch (e) { showError("Ошибка при сохранении."); }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>⚠ Ошибка</h2><p>${m}</p></div>`; }
+    function showError(m) { appDiv.innerHTML = `<div class="card" style="text-align:center;"><h2>⚠</h2><p>${m}</p></div>`; }
 
     init();
 </script>
