@@ -1,9 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sysevolve Test</title>
+</head>
+<body>
+
 <script type="module">
-    // Подключаем библиотеки Firebase из облака
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Твой персональный конфиг, который ты получил в консоли
     const firebaseConfig = {
         apiKey: "AIzaSyC7hWzafvWz28vSGzG9RakaUSr375VmA-o",
         authDomain: "sysevolve-platform.firebaseapp.com",
@@ -13,11 +19,12 @@
         appId: "1:1087336122097:web:a2f724106e23f82deccb50"
     };
 
-    // Инициализация
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 1. ПРОВЕРКА ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+    // Скрываем интерфейс пока идет проверка
+    document.body.innerHTML = '<div id="loader" style="text-align:center; margin-top:100px;">Проверка доступа...</div>';
+
     window.onload = async function() {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
@@ -28,7 +35,6 @@
         }
 
         try {
-            // Проверяем токен напрямую в базе Google Firestore
             const docRef = doc(db, "tokens", token);
             const docSnap = await getDoc(docRef);
 
@@ -37,87 +43,49 @@
             } else if (docSnap.data().used === true) {
                 showError("Этот тест уже был пройден ранее.");
             } else {
-                console.log("Доступ разрешен для:", docSnap.data().name);
-                window.userToken = token; // Сохраняем токен
+                window.userToken = token;
+                // Показываем тест только если токен ок
+                showTestUI(docSnap.data().name);
             }
         } catch (e) {
-            console.error("Ошибка Firebase:", e);
+            console.error(e);
             showError("Ошибка подключения к облаку.");
         }
     };
 
-    // 2. ФУНКЦИЯ ОТПРАВКИ РЕЗУЛЬТАТОВ
-    // Вызывай её так: finishTest({ "вопрос1": "ответ", "вопрос2": "ответ" });
     window.finishTest = async function(answers) {
-        if (!window.userToken) {
-            alert("Ошибка: Сессия не авторизована.");
-            return;
-        }
-
         try {
             const docRef = doc(db, "tokens", window.userToken);
-            
-            // Записываем результаты в облако и помечаем ссылку как использованную
             await updateDoc(docRef, {
                 results: answers,
                 used: true,
                 finishedAt: new Date().toISOString()
             });
-
-            alert("Ваши ответы успешно сохранены в облаке Sysevolve!");
-            document.body.innerHTML = "<h1 style='text-align:center; padding:50px;'>Тест завершен. Спасибо!</h1>";
+            document.body.innerHTML = "<h1 style='text-align:center; padding:50px; font-family:sans-serif;'>Тест завершен. Спасибо!</h1>";
         } catch (error) {
-            alert("Ошибка при сохранении в базу данных.");
-            console.error(error);
+            alert("Ошибка сохранения.");
         }
     };
+
+    function showTestUI(userName) {
+        document.body.innerHTML = `
+            <div style="max-width: 500px; margin: 50px auto; font-family: sans-serif; text-align: center; border: 1px solid #ddd; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <h2 style="color: #007bff;">Здравствуйте, ${userName}!</h2>
+                <p>Система Sysevolve готова к работе. Нажмите кнопку ниже для завершения проверки.</p>
+                <button onclick="window.finishTest({'status': 'verified'})" style="background-color: #28a745; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer;">
+                    Отправить результат
+                </button>
+            </div>`;
+    }
 
     function showError(msg) {
         document.body.innerHTML = `
             <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
                 <h1 style="color:red;">⚠</h1>
                 <h2>${msg}</h2>
-                <p>Пожалуйста, обратитесь к администратору Sysevolve.</p>
             </div>`;
     }
-
 </script>
-<div id="main-container" style="max-width: 600px; margin: 50px auto; font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; text-align: center;">
-    <h1 style="color: #007bff;">Тестирование Sysevolve</h1>
-    <p>Добро пожаловать! Нажмите кнопку ниже, чтобы отправить тестовый ответ и проверить систему.</p>
-    
-    <div style="margin: 30px 0;">
-        <button onclick="sendTestResult()" style="background: #28a745; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 16px;">
-            Завершить тест (отправить данные)
-        </button>
-    </div>
-</div>
 
-<script>
-    // Простая функция для проверки связи с базой
-    async function sendTestResult() {
-        const dummyAnswers = { "test_status": "Система работает!", "date": new Date().toLocaleString() };
-        await window.finishTest(dummyAnswers);
-    }
-</script>
-<div id="test-ui" style="max-width: 500px; margin: 50px auto; font-family: sans-serif; text-align: center; border: 1px solid #ddd; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-    <h2 style="color: #007bff;">Тест Sysevolve</h2>
-    <p>Система авторизации подтверждена. Вы готовы начать?</p>
-    
-    <div style="margin-top: 20px;">
-        <button onclick="sendFinalResult()" style="background-color: #28a745; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer;">
-            Завершить и отправить результат
-        </button>
-    </div>
-</div>
-
-<script>
-    // Эта функция связывает вашу кнопку с основным скриптом
-    async function sendFinalResult() {
-        const testData = {
-            "status": "Тестовый запуск успешен",
-            "message": "Клиент увидел эту кнопку и нажал её"
-        };
-        await window.finishTest(testData);
-    }
-</script>
+</body>
+</html>
