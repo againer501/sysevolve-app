@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Sysevolve Admin Panel</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 400px; text-align: center; }
+        h2 { color: #1a73e8; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #1557b0; }
+        #result { margin-top: 20px; word-break: break-all; font-size: 14px; color: #188038; background: #e6f4ea; padding: 15px; border-radius: 8px; display: none; border: 1px solid #ceead6; }
+        .copy-hint { font-size: 11px; color: #70757a; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Sysevolve Admin</h2>
+        <p>Создание уникальной ссылки для клиента</p>
+        <input type="text" id="clientName" placeholder="Имя клиента (напр. Knauf_Manager)">
+        <button onclick="createLink()">Создать ссылку доступа</button>
+        <div id="result" id="copyArea"></div>
+        <p class="copy-hint">После нажатия ссылка автоматически сохранится в облаке Google</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Твой конфиг Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7hWzafvWz28vSGzG9RakaUSr375VmA-o",
+            authDomain: "sysevolve-platform.firebaseapp.com",
+            projectId: "sysevolve-platform",
+            storageBucket: "sysevolve-platform.firebasestorage.app",
+            messagingSenderId: "1087336122097",
+            appId: "1:1087336122097:web:a2f724106e23f82deccb50"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.createLink = async () => {
+            const name = document.getElementById('clientName').value;
+            if (!name) return alert("Пожалуйста, введите имя клиента!");
+
+            // Генерируем случайный токен
+            const token = Math.random().toString(36).substr(2, 9);
+            
+            // Формируем ссылку на соседний файл index.html
+            const baseUrl = window.location.href.replace('admin.html', 'index.html');
+            const finalLink = `${baseUrl}?token=${token}`;
+
+            try {
+                // Сохраняем информацию в Firestore
+                await setDoc(doc(db, "tokens", token), {
+                    name: name,
+                    used: false,
+                    createdAt: new Date().toISOString()
+                });
+
+                const resDiv = document.getElementById('result');
+                resDiv.style.display = "block";
+                resDiv.innerHTML = `<strong>Ссылка создана для ${name}:</strong><br><br>${finalLink}`;
+            } catch (e) {
+                console.error(e);
+                alert("Ошибка базы данных: " + e.message);
+            }
+        }
+    </script>
+</body>
+</html>

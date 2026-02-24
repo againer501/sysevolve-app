@@ -1,0 +1,83 @@
+<script type="module">
+    // Подключаем библиотеки Firebase из облака
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Твой персональный конфиг, который ты получил в консоли
+    const firebaseConfig = {
+        apiKey: "AIzaSyC7hWzafvWz28vSGzG9RakaUSr375VmA-o",
+        authDomain: "sysevolve-platform.firebaseapp.com",
+        projectId: "sysevolve-platform",
+        storageBucket: "sysevolve-platform.firebasestorage.app",
+        messagingSenderId: "1087336122097",
+        appId: "1:1087336122097:web:a2f724106e23f82deccb50"
+    };
+
+    // Инициализация
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 1. ПРОВЕРКА ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+    window.onload = async function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            showError("Доступ запрещен. Используйте персональную ссылку.");
+            return;
+        }
+
+        try {
+            // Проверяем токен напрямую в базе Google Firestore
+            const docRef = doc(db, "tokens", token);
+            const docSnap = await getDoc(docRef);
+
+            if (!docSnap.exists()) {
+                showError("Ссылка недействительна.");
+            } else if (docSnap.data().used === true) {
+                showError("Этот тест уже был пройден ранее.");
+            } else {
+                console.log("Доступ разрешен для:", docSnap.data().name);
+                window.userToken = token; // Сохраняем токен
+            }
+        } catch (e) {
+            console.error("Ошибка Firebase:", e);
+            showError("Ошибка подключения к облаку.");
+        }
+    };
+
+    // 2. ФУНКЦИЯ ОТПРАВКИ РЕЗУЛЬТАТОВ
+    // Вызывай её так: finishTest({ "вопрос1": "ответ", "вопрос2": "ответ" });
+    window.finishTest = async function(answers) {
+        if (!window.userToken) {
+            alert("Ошибка: Сессия не авторизована.");
+            return;
+        }
+
+        try {
+            const docRef = doc(db, "tokens", window.userToken);
+            
+            // Записываем результаты в облако и помечаем ссылку как использованную
+            await updateDoc(docRef, {
+                results: answers,
+                used: true,
+                finishedAt: new Date().toISOString()
+            });
+
+            alert("Ваши ответы успешно сохранены в облаке Sysevolve!");
+            document.body.innerHTML = "<h1 style='text-align:center; padding:50px;'>Тест завершен. Спасибо!</h1>";
+        } catch (error) {
+            alert("Ошибка при сохранении в базу данных.");
+            console.error(error);
+        }
+    };
+
+    function showError(msg) {
+        document.body.innerHTML = `
+            <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
+                <h1 style="color:red;">⚠</h1>
+                <h2>${msg}</h2>
+                <p>Пожалуйста, обратитесь к администратору Sysevolve.</p>
+            </div>`;
+    }
+</script>
