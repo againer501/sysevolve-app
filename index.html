@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sysevolve | Профильный анализ личности (PPA)</title>
+    <title>Sysevolve | Инструкция PPA</title>
     <style>
         :root { --primary: #244381; --secondary: #8DC53F; --bg: #f4f7f6; --text: #1e293b; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { width: 100%; max-width: 650px; padding: 20px; }
-        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; position: relative; }
-        .logo { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 10px; letter-spacing: 2px; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
+        .logo { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 20px; letter-spacing: 2px; }
+        
+        /* Стили инструкции */
+        .instruction-box { text-align: left; background: #f8fafc; padding: 25px; border-radius: 12px; border-left: 5px solid var(--secondary); margin-bottom: 30px; }
+        .instruction-box h3 { margin-top: 0; color: var(--primary); }
+        .instruction-box ul { padding-left: 20px; }
+        .instruction-box li { margin-bottom: 10px; line-height: 1.4; }
+
         .progress-container { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 25px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
-        .instruction { font-size: 14px; color: #64748b; margin-bottom: 25px; line-height: 1.5; }
+        
         .word-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
-        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 12px; transition: 0.2s; }
-        .word-text { font-weight: 600; font-size: 16px; color: #334155; }
-        .btn-group { display: flex; gap: 10px; }
-        .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; justify-content: center; outline: none; }
-        .btn-choice.plus:hover, .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; box-shadow: 0 0 10px rgba(22,101,52,0.2); }
-        .btn-choice.minus:hover, .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; box-shadow: 0 0 10px rgba(153,27,27,0.2); }
-        .footer-btns { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
-        #next-btn { background: var(--primary); color: white; border: none; padding: 12px 35px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        #next-btn:disabled { background: #cbd5e1; cursor: not-allowed; opacity: 0.7; }
+        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 12px; }
+        .word-text { font-weight: 600; font-size: 16px; }
+        
+        .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
+        .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
+        
+        button#start-btn, button#next-btn { background: var(--primary); color: white; border: none; padding: 15px 40px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        button#next-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -30,7 +37,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка Sysevolve PPA...</p></div>
+    <div class="card"><div class="loader"></div><p>Загрузка профиля...</p></div>
 </div>
 
 <script type="module">
@@ -49,7 +56,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Данные взяты из предоставленного файла index_20.02.html
     const questions = [
         { options: [{t:"Мягкий",v:"S"}, {t:"Убедительный",v:"I"}, {t:"Скромный",v:"C"}, {t:"Решительный",v:"D"}] },
         { options: [{t:"Послушный",v:"C"}, {t:"Жизнерадостный",v:"I"}, {t:"Настойчивый",v:"D"}, {t:"Миролюбивый",v:"S"}] },
@@ -80,117 +86,103 @@
     let currentIdx = 0;
     let userToken = "";
     let userName = "";
-    let choices = []; // Хранит {plus: 'D', minus: 'I'} для каждой из 24 групп
-
+    let choices = [];
     const appDiv = document.getElementById('app');
 
     async function init() {
         const params = new URLSearchParams(window.location.search);
         userToken = params.get('token');
-        if (!userToken) return showError("Токен доступа отсутствует.");
+        if (!userToken) return showError("Ошибка доступа.");
 
         try {
             const snap = await getDoc(doc(db, "tokens", userToken));
-            if (!snap.exists()) return showError("Недействительная ссылка.");
-            if (snap.data().used) return showError("Вы уже проходили этот тест.");
-            
+            if (!snap.exists() || snap.data().used) return showError("Ссылка более не активна.");
             userName = snap.data().name;
-            renderQuiz();
-        } catch (e) {
-            showError("Ошибка подключения к серверу.");
-        }
+            renderInstruction();
+        } catch (e) { showError("Ошибка сети."); }
     }
+
+    // --- НОВЫЙ ШАГ: ЭКРАН ИНСТРУКЦИИ ---
+    function renderInstruction() {
+        appDiv.innerHTML = `
+            <div class="card">
+                <div class="logo">SYSEVOLVE</div>
+                <h2>Профильный анализ личности</h2>
+                <div class="instruction-box">
+                    <h3>Инструкция для ${userName}:</h3>
+                    <ul>
+                        <li>Перед вами будут группы из 4-х слов.</li>
+                        <li>В каждой группе выберите <b>одно слово (+)</b>, которое лучше всего описывает ваше поведение на работе.</li>
+                        <li>Затем выберите <b>одно слово (-)</b>, которое подходит вам меньше всего.</li>
+                        <li>Не раздумывайте долго, первая реакция самая точная.</li>
+                    </ul>
+                </div>
+                <button id="start-btn" onclick="window.startQuiz()">Начать тестирование</button>
+            </div>
+        `;
+    }
+
+    window.startQuiz = () => renderQuiz();
 
     function renderQuiz() {
         const q = questions[currentIdx];
         const progress = (currentIdx / questions.length) * 100;
-
         appDiv.innerHTML = `
             <div class="card">
                 <div class="logo">SYSEVOLVE</div>
-                <div class="instruction">
-                    Здравствуйте, ${userName}. В каждой группе выберите <b>одно</b> слово, которое вам подходит больше всего (+), и <b>одно</b>, которое подходит меньше всего (-).
-                </div>
                 <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
                             <span class="word-text">${opt.t}</span>
-                            <div class="btn-group">
-                                <button class="btn-choice plus" id="p-${i}" onclick="selectWord(${i}, 'plus')">+</button>
-                                <button class="btn-choice minus" id="m-${i}" onclick="selectWord(${i}, 'minus')">-</button>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-choice plus" id="p-${i}" onclick="select(${i}, 'plus')">+</button>
+                                <button class="btn-choice minus" id="m-${i}" onclick="select(${i}, 'minus')">-</button>
                             </div>
                         </div>
                     `).join('')}
                 </div>
-                <div class="footer-btns">
-                    <span style="font-size: 14px; color: #64748b;">Группа ${currentIdx + 1} из ${questions.length}</span>
-                    <button id="next-btn" disabled onclick="handleNext()">Далее</button>
+                <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Группа ${currentIdx+1}/${questions.length}</span>
+                    <button id="next-btn" disabled onclick="window.goNext()">Далее</button>
                 </div>
             </div>
         `;
     }
 
-    window.selectWord = (idx, type) => {
+    window.select = (idx, type) => {
         const q = questions[currentIdx];
-        // Сброс активных кнопок для данного типа в текущей группе
-        for(let i=0; i<4; i++) {
-            document.getElementById((type === 'plus' ? 'p-' : 'm-') + i).classList.remove('active');
-        }
+        for(let i=0; i<4; i++) document.getElementById((type==='plus'?'p-':'m-')+i).classList.remove('active');
+        document.getElementById((type==='plus'?'p-':'m-')+idx).classList.add('active');
         
-        document.getElementById((type === 'plus' ? 'p-' : 'm-') + idx).classList.add('active');
-        
-        if (!choices[currentIdx]) choices[currentIdx] = {};
+        if(!choices[currentIdx]) choices[currentIdx] = {};
         choices[currentIdx][type] = q.options[idx].v;
 
-        // Валидация: выбраны оба и это разные слова
         const btn = document.getElementById('next-btn');
-        if (choices[currentIdx].plus && choices[currentIdx].minus) {
+        if(choices[currentIdx].plus && choices[currentIdx].minus) {
             btn.disabled = (choices[currentIdx].plus === choices[currentIdx].minus);
         }
     };
 
-    window.handleNext = () => {
+    window.goNext = () => {
         currentIdx++;
-        if (currentIdx < questions.length) {
-            renderQuiz();
-        } else {
-            saveResults();
-        }
+        if(currentIdx < questions.length) renderQuiz();
+        else finish();
     };
 
-    async function saveResults() {
-        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Обработка результатов...</p></div>';
-        
-        // Подсчет итоговых баллов DISC
-        const finalScores = choices.reduce((acc, curr) => {
+    async function finish() {
+        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение...</p></div>';
+        const scores = choices.reduce((acc, curr) => {
             acc[curr.plus]++;
-            acc[curr.minus]--; // Упрощенная логика: плюс повышает, минус понижает
+            acc[curr.minus]--;
             return acc;
         }, { D: 0, I: 0, S: 0, C: 0 });
 
-        try {
-            await updateDoc(doc(db, "tokens", userToken), {
-                results: finalScores,
-                used: true,
-                finishedAt: new Date().toISOString()
-            });
-            
-            appDiv.innerHTML = `
-                <div class="card">
-                    <div class="logo" style="color: var(--secondary)">ГОТОВО</div>
-                    <h2>Спасибо, ${userName}!</h2>
-                    <p>Ваш профильный анализ успешно завершен. Результаты переданы консультанту.</p>
-                </div>
-            `;
-        } catch (e) {
-            showError("Не удалось сохранить результаты. Попробуйте еще раз.");
-        }
+        await updateDoc(doc(db, "tokens", userToken), { results: scores, used: true, finishedAt: new Date().toISOString() });
+        appDiv.innerHTML = `<div class="card"><div class="logo">SYSEVOLVE</div><h2>Готово!</h2><p>Спасибо, ${userName}. Анализ завершен.</p></div>`;
     }
 
-    function showError(msg) {
-        appDiv.innerHTML = `<div class="card"><h2 style="color: #dc3545">⚠ Ошибка</h2><p>${msg}</p></div>`;
-    }
+    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>⚠</h2><p>${m}</p></div>`; }
 
     init();
 </script>
