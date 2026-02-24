@@ -100,3 +100,24 @@
         await window.finishTest(dummyAnswers);
     }
 </script>
+<div id="test-ui" style="max-width: 500px; margin: 50px auto; font-family: sans-serif; text-align: center; border: 1px solid #ddd; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <h2 style="color: #007bff;">Тест Sysevolve</h2>
+    <p>Система авторизации подтверждена. Вы готовы начать?</p>
+    
+    <div style="margin-top: 20px;">
+        <button onclick="sendFinalResult()" style="background-color: #28a745; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor: pointer;">
+            Завершить и отправить результат
+        </button>
+    </div>
+</div>
+
+<script>
+    // Эта функция связывает вашу кнопку с основным скриптом
+    async function sendFinalResult() {
+        const testData = {
+            "status": "Тестовый запуск успешен",
+            "message": "Клиент увидел эту кнопку и нажал её"
+        };
+        await window.finishTest(testData);
+    }
+</script>
