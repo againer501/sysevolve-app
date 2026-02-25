@@ -12,6 +12,7 @@
             --bg: #f4f7f6; 
             --text: #1e293b; 
             --border: #e2e8f0;
+            --brand-gray: #94a3b8; /* Тот самый приятный серый */
         }
         
         body { 
@@ -49,28 +50,27 @@
         }
 
         .logo-container {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: center;
+            min-height: 40px; /* Резервируем место */
         }
 
         .logo-img {
-            max-height: 45px; 
+            max-height: 50px; /* Чуть увеличил для читаемости */
             width: auto;
             display: block;
         }
 
-        /* Название бренда - теперь вспомогательное */
         .brand-sub {
             font-size: 11px;
             font-weight: 500;
-            color: #94a3b8;
+            color: var(--brand-gray);
             text-transform: uppercase;
             letter-spacing: 3px;
             margin-bottom: 4px;
         }
 
-        /* Название теста - главный акцент */
         .header-main-title {
             font-size: 18px; 
             font-weight: 800;
@@ -84,45 +84,24 @@
             .card { padding: 30px 20px; }
             .header-main-title { font-size: 15px; }
             .brand-sub { font-size: 9px; letter-spacing: 2px; }
-            .logo-img { max-height: 38px; }
+            .logo-img { max-height: 40px; }
         }
 
-        /* Стили элементов формы */
+        /* Форма и остальное */
         h2 { font-size: 22px; margin-bottom: 25px; color: var(--primary); font-weight: 600; }
         .form-group { margin-bottom: 18px; text-align: left; }
         label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #64748b; }
         label span { color: #ef4444; }
-        
-        input { 
-            width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; 
-            box-sizing: border-box; font-size: 16px; font-family: inherit;
-        }
-        
-        .btn-main { 
-            width: 100%; background: var(--primary); color: white; border: none; 
-            padding: 18px; border-radius: 12px; cursor: pointer; 
-            font-weight: 700; font-size: 15px; text-transform: uppercase; 
-            letter-spacing: 1px; font-family: inherit; margin-top: 15px;
-            transition: all 0.2s;
-        }
-        .btn-main:hover { background: #1a3261; opacity: 0.9; }
-        .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
-
+        input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; box-sizing: border-box; font-size: 16px; font-family: inherit; }
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; }
+        .btn-main:disabled { background: #cbd5e1; }
         .progress-container { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
-        
         .word-grid { display: grid; gap: 10px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid var(--border); border-radius: 14px; }
-        .word-item span { font-weight: 500; font-size: 15px; }
-
-        .btn-choice { 
-            border: 1px solid var(--border); background: white; border-radius: 50%; 
-            width: 40px; height: 40px; cursor: pointer; font-weight: 600; 
-            font-size: 18px; font-family: inherit; transition: 0.2s; 
-        }
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-weight: 600; font-size: 18px; transition: 0.2s; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
-        
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -182,11 +161,11 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
-    // ШАПКА С LOGO.JPG И ПРАВИЛЬНЫМИ АКЦЕНТАМИ
+    // ИСПРАВЛЕННЫЙ ПУТЬ К LOGO.JPG
     const headerHTML = `
         <div class="header-block">
             <div class="logo-container">
-                <img src="logo.jpg" alt="" class="logo-img" onerror="this.style.display='none';">
+                <img src="./logo.jpg" alt="" class="logo-img" onerror="this.style.display='none';">
             </div>
             <div class="brand-sub">SYSEVOLVE</div>
             <div class="header-main-title">Профиль личности DISC</div>
