@@ -24,7 +24,7 @@
             min-height: 100vh; 
         }
 
-        .container { width: 100%; max-width: 650px; padding: 20px; }
+        .container { width: 100%; max-width: 650px; padding: 20px; box-sizing: border-box; }
         .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
 
         .header-row {
@@ -36,38 +36,49 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
+        /* Настройка идентичного веса для заголовков */
         .header-left, .header-right {
             font-family: 'Inter', sans-serif;
-            font-size: 18px;
-            font-weight: 900; /* В Inter вес 900 очень мощный и ровный */
+            font-size: 16px;
+            font-weight: 900; 
             color: var(--primary);
             text-transform: uppercase;
             line-height: 1;
         }
 
         .header-left {
-            letter-spacing: 0.8px; /* Небольшой зазор для кириллицы, чтобы она не "слипалась" */
+            letter-spacing: 0.5px; /* Минимальный зазор для кириллицы */
         }
 
         .header-right {
-            letter-spacing: -0.2px; /* Латиница в Inter чуть шире, слегка поджимаем её */
+            letter-spacing: 0px;
         }
 
-        /* Остальные стили формы */
         h2 { font-size: 22px; margin-bottom: 25px; color: var(--primary); font-weight: 700; }
+        
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        label span { color: #dc3545; }
         input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; font-family: inherit; }
-        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 16px; text-transform: uppercase; font-family: inherit; margin-top: 20px; transition: 0.3s; }
+        
+        .instruction-text { line-height: 1.6; font-size: 15px; color: #334155; text-align: left; }
+        .instruction-text p { margin-bottom: 15px; }
+        .instruction-text ul { padding-left: 20px; margin-bottom: 20px; }
+        .instruction-text li { margin-bottom: 8px; }
+
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; font-family: inherit; margin-top: 20px; transition: 0.3s; }
         .btn-main:hover { background: #1a3261; }
-        .btn-main:disabled { background: #cbd5e1; }
+        .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
+
         .progress-container { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 25px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
+        
         .word-grid { display: grid; gap: 10px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; }
         .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-weight: 900; font-size: 18px; transition: 0.2s; font-family: inherit; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
+        
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -193,13 +204,18 @@
     window.startQuiz = () => renderQuiz();
 
     window.select = (idx, type) => {
+        const qChoices = choices[currentIdx] || {};
+        qChoices[type] = questions[currentIdx].options[idx].v;
+        choices[currentIdx] = qChoices;
+
+        // Визуальное обновление кнопок
         for(let i=0; i<4; i++) {
             const el = document.getElementById((type==='plus'?'p-':'m-')+i);
             if(el) el.classList.remove('active');
         }
         document.getElementById((type==='plus'?'p-':'m-')+idx).classList.add('active');
-        if(!choices[currentIdx]) choices[currentIdx] = {};
-        choices[currentIdx][type] = questions[currentIdx].options[idx].v;
+
+        // Проверка готовности кнопки "Далее"
         const btn = document.getElementById('next-btn');
         if(choices[currentIdx].plus && choices[currentIdx].minus) {
             btn.disabled = (choices[currentIdx].plus === choices[currentIdx].minus);
