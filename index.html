@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sysevolve | Профильный анализ DISC</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sysevolve | DISC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
             --primary: #244381; 
@@ -21,9 +21,9 @@
             margin: 0; 
             display: flex; 
             justify-content: center; 
-            align-items: center; 
+            align-items: flex-start; /* Чтобы на мобильных не прилипало к центру */
             min-height: 100vh; 
-            padding: 15px;
+            padding: 20px 15px;
             box-sizing: border-box;
             -webkit-font-smoothing: antialiased;
         }
@@ -32,103 +32,97 @@
         
         .card { 
             background: white; 
-            padding: 40px; 
-            border-radius: 24px; 
+            padding: 30px; 
+            border-radius: 20px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.04); 
             text-align: center; 
         }
 
-        /* АДАПТИВНАЯ ШАПКА */
+        /* ИСПРАВЛЕННАЯ ШАПКА */
         .header-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            align-items: center; /* Центрирование по вертикали */
+            flex-wrap: wrap; /* ГЛАВНОЕ: позволяет элементам переноситься, а не сжиматься */
+            gap: 10px;
+            margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 1px solid var(--border);
         }
 
         .header-left {
             font-size: 14px;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: left;
+            flex: 1 1 auto; /* Растягивается, но не ломается */
+            min-width: 150px; /* Чтобы не сжималось в кашу */
+            white-space: nowrap; /* Запрещаем перенос внутри фразы на десктопе */
         }
 
         .header-right {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 800;
             color: var(--primary);
             text-transform: uppercase;
             text-align: right;
         }
 
-        /* Стили для мобильных устройств */
+        /* АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ */
         @media (max-width: 480px) {
-            .card { padding: 25px 20px; }
+            .card { padding: 25px 15px; }
+            
             .header-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-                margin-bottom: 20px;
+                flex-direction: column; /* На узких экранах ставим друг под друга */
+                align-items: center; 
+                text-align: center;
+                gap: 5px;
             }
-            .header-right {
-                order: -1; /* Логотип наверх */
-                font-size: 11px;
-                opacity: 0.6;
-            }
+
             .header-left {
-                font-size: 14px;
-                line-height: 1.3;
+                text-align: center;
+                font-size: 12px;
+                white-space: normal; /* На мобильных разрешаем аккуратный перенос по словам */
+                line-height: 1.4;
+                order: 2; /* Текст профиля ниже названия компании */
             }
-            h2 { font-size: 18px; }
+
+            .header-right {
+                text-align: center;
+                font-size: 18px;
+                order: 1; /* SYSEVOLVE выше */
+                margin-bottom: 5px;
+            }
+
+            h2 { font-size: 20px; margin: 15px 0; }
         }
 
+        /* Стили формы */
         h2 { font-size: 22px; margin-bottom: 25px; color: var(--primary); font-weight: 600; }
-        
-        .form-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #64748b; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
         label span { color: #ef4444; }
         
         input { 
-            width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; 
-            box-sizing: border-box; font-size: 16px; font-family: inherit; font-weight: 400;
-            transition: all 0.2s;
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; 
+            box-sizing: border-box; font-size: 16px; font-family: inherit;
         }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(36, 67, 129, 0.1); }
         
-        .instruction-text { line-height: 1.6; font-size: 15px; color: #475569; text-align: left; }
-        .instruction-text p { margin-bottom: 15px; }
-        .instruction-text ul { padding-left: 20px; margin-bottom: 20px; }
-        .instruction-text li { margin-bottom: 8px; }
-
         .btn-main { 
             width: 100%; background: var(--primary); color: white; border: none; 
-            padding: 16px; border-radius: 12px; cursor: pointer; 
-            font-weight: 600; font-size: 15px; text-transform: uppercase; 
-            letter-spacing: 0.5px; font-family: inherit; margin-top: 10px; 
-            transition: all 0.2s;
+            padding: 16px; border-radius: 10px; cursor: pointer; 
+            font-weight: 700; font-size: 15px; text-transform: uppercase; 
+            letter-spacing: 1px; font-family: inherit; margin-top: 15px;
         }
-        .btn-main:hover { background: #1a3261; }
-        .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        .progress-container { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
+        /* Тестовая часть */
+        .progress-container { height: 6px; background: var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
-        
-        .word-grid { display: grid; gap: 12px; }
-        .word-item { 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 12px 16px; border: 1px solid var(--border); border-radius: 14px;
-        }
-        .word-item span { font-weight: 500; font-size: 15px; }
-
-        .btn-choice { 
-            border: 1px solid var(--border); background: white; border-radius: 50%; 
-            width: 38px; height: 38px; cursor: pointer; font-weight: 600; 
-            font-size: 18px; transition: all 0.2s; font-family: inherit; 
-        }
+        .word-grid { display: grid; gap: 10px; }
+        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border: 1px solid var(--border); border-radius: 12px; }
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-weight: 600; font-size: 18px; font-family: inherit; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         
@@ -242,11 +236,11 @@
             <div class="card">
                 ${headerHTML}
                 <h2>Инструкция</h2>
-                <div class="instruction-text">
+                <div class="instruction-text" style="text-align:left; font-size:15px; line-height:1.6;">
                     <p>Это не тест на интеллект. Выбирайте слова, которые <b>больше всего (+)</b> и <b>меньше всего (-)</b> описывают вас на работе.</p>
                     <ul>
                         <li>Оценивайте себя только в рабочей ситуации.</li>
-                        <li>В каждой группе — один плюс и один минус.</li>
+                        <li>В каждой группе выберите ровно один плюс и один минус.</li>
                     </ul>
                 </div>
                 <button class="btn-main" onclick="window.startQuiz()">Начать</button>
@@ -259,13 +253,11 @@
     window.select = (idx, type) => {
         if(!choices[currentIdx]) choices[currentIdx] = {};
         choices[currentIdx][type] = questions[currentIdx].options[idx].v;
-
         for(let i=0; i<4; i++) {
             const el = document.getElementById((type==='plus'?'p-':'m-')+i);
             if(el) el.classList.remove('active');
         }
         document.getElementById((type==='plus'?'p-':'m-')+idx).classList.add('active');
-
         const btn = document.getElementById('next-btn');
         if(choices[currentIdx].plus && choices[currentIdx].minus) {
             btn.disabled = (choices[currentIdx].plus === choices[currentIdx].minus);
@@ -288,7 +280,7 @@
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
-                            <span>${opt.t}</span>
+                            <span style="font-weight:500;">${opt.t}</span>
                             <div style="display:flex; gap:8px;">
                                 <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
                                 <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
@@ -297,15 +289,15 @@
                     `).join('')}
                 </div>
                 <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:12px; color:#94a3b8; font-weight:500;">Группа ${currentIdx+1} из ${questions.length}</span>
-                    <button id="next-btn" class="btn-main" style="width:auto; padding:12px 30px; margin:0;" disabled onclick="window.goNext()">Далее</button>
+                    <span style="font-size:12px; color:#94a3b8;">Группа ${currentIdx+1} из ${questions.length}</span>
+                    <button id="next-btn" class="btn-main" style="width:auto; padding:10px 25px; margin:0;" disabled onclick="window.goNext()">Далее</button>
                 </div>
             </div>
         `;
     }
 
     async function finish() {
-        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение...</p></div>';
+        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение результатов...</p></div>';
         const scores = choices.reduce((acc, curr) => {
             acc[curr.plus]++;
             acc[curr.minus]--;
@@ -321,14 +313,14 @@
             appDiv.innerHTML = `
                 <div class="card">
                     ${headerHTML}
-                    <div style="color:var(--secondary); font-size: 50px; margin-bottom: 10px;">✓</div>
+                    <div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div>
                     <h2>Готово!</h2>
-                    <p style="color:#64748b;">Благодарим за участие, ${userData.name}. Ваши результаты переданы консультанту.</p>
+                    <p style="color:#64748b;">Ваши ответы успешно сохранены. Благодарим за участие!</p>
                 </div>`;
-        } catch (e) { showError("Ошибка при сохранении."); }
+        } catch (e) { showError("Ошибка сохранения."); }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card">${headerHTML}<h2>Ошибка</h2><p>${m}</p></div>`; }
+    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
 
     init();
 </script>
