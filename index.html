@@ -3,107 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sysevolve | Профильный Анализ Личности</title>
+    <title>DISC | Профильный Анализ</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary: #244381; 
-            --secondary: #8DC53F; 
-            --bg: #f4f7f6; 
-            --text: #1e293b; 
-            --border: #e2e8f0;
-        }
+        :root { --p: #244381; --s: #8DC53F; --bg: #f4f7f6; --t: #1e293b; --b: #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--t); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
+        .v4-container { width: 100%; max-width: 600px; }
+        .v4-card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
         
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: flex-start; 
-            min-height: 100vh; 
-            padding: 20px 15px;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
+        /* Обновленная шапка */
+        .v4-header { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 2px solid #f1f5f9; }
+        .v4-logo { max-height: 60px; width: auto; display: inline-block; margin-bottom: 15px; }
+        .v4-title { font-size: 16px; font-weight: 800; color: var(--p); text-transform: uppercase; letter-spacing: 1px; margin: 0; }
 
-        .container { width: 100%; max-width: 600px; }
-        
-        .card { 
-            background: white; 
-            padding: 40px 30px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.04); 
-            text-align: center; 
-        }
+        @media (max-width: 480px) { .v4-card { padding: 25px 15px; } .v4-title { font-size: 13px; } .v4-logo { max-height: 45px; } }
 
-        /* ШАПКА: ТОЛЬКО ЛОГО И ТИТУЛ */
-        .brand-header {
-            display: block;
-            margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 2px solid #f1f5f9;
-        }
-
-        .brand-logo-wrap {
-            margin-bottom: 15px;
-        }
-
-        .brand-logo-img {
-            max-height: 60px;
-            width: auto;
-            display: inline-block;
-        }
-
-        .brand-title-text {
-            font-size: 17px; 
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-            display: block;
-        }
-
-        @media (max-width: 480px) {
-            .card { padding: 25px 15px; }
-            .brand-title-text { font-size: 14px; }
-            .brand-logo-img { max-height: 45px; }
-        }
-
-        /* Элементы формы */
-        h2 { font-size: 20px; margin-bottom: 20px; color: var(--primary); font-weight: 600; }
-        .form-group { margin-bottom: 15px; text-align: left; }
+        h2 { font-size: 20px; margin-bottom: 20px; color: var(--p); }
+        .v4-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
-        label span { color: #ef4444; }
-        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; font-family: inherit; }
+        input { width: 100%; padding: 12px; border: 1px solid var(--b); border-radius: 10px; box-sizing: border-box; font-size: 16px; }
         
-        .btn-main { 
-            width: 100%; background: var(--primary); color: white; border: none; 
-            padding: 18px; border-radius: 12px; cursor: pointer; 
-            font-weight: 700; font-size: 15px; text-transform: uppercase; 
-            letter-spacing: 1px; margin-top: 10px; font-family: inherit;
-        }
-        .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .v4-btn { width: 100%; background: var(--p); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
+        .v4-btn:disabled { background: #cbd5e1; }
 
-        .progress-container { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
+        .v4-progress-w { height: 6px; background: var(--b); border-radius: 10px; margin: 25px 0; overflow: hidden; }
+        .v4-progress-b { height: 100%; background: var(--s); transition: width 0.4s; }
         
-        .word-grid { display: grid; gap: 8px; }
-        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
-        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-weight: 600; font-size: 18px; transition: 0.2s; }
-        .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
-        .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
+        .v4-grid { display: grid; gap: 8px; }
+        .v4-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--b); border-radius: 12px; }
+        .v4-choice { border: 1px solid var(--b); background: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-weight: 600; }
+        .v4-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
+        .v4-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .v4-loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--p); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+<div id="v4-app" class="v4-container">
+    <div class="v4-card"><div class="v4-loader"></div><p>Загрузка...</p></div>
 </div>
 
 <script type="module">
@@ -153,15 +92,12 @@
     let userToken = "";
     let userData = {};
     let choices = [];
-    const appDiv = document.getElementById('app');
+    const appDiv = document.getElementById('v4-app');
 
-    // ФИКСИРОВАННАЯ ШАПКА: Рисунок1.jpg и v=3 для обхода кэша
     const headerHTML = `
-        <header class="brand-header">
-            <div class="brand-logo-wrap">
-                <img src="./Рисунок1.jpg?v=3" alt="Logo" class="brand-logo-img">
-            </div>
-            <h1 class="brand-title-text">Профиль личности DISC</h1>
+        <header class="v4-header">
+            <img src="./Рисунок1.jpg?update=final" alt="Logo" class="v4-logo">
+            <div class="v4-title">Профильный Анализ Личности</div>
         </header>
     `;
 
@@ -178,16 +114,16 @@
 
     function renderForm(dbName) {
         appDiv.innerHTML = `
-            <div class="card">
+            <div class="v4-card">
                 ${headerHTML}
                 <h2>Регистрация</h2>
                 <form id="reg-form">
-                    <div class="form-group"><label>Имя <span>*</span></label><input type="text" id="f-name" value="${dbName || ''}" required></div>
-                    <div class="form-group"><label>Фамилия <span>*</span></label><input type="text" id="f-surname" required></div>
-                    <div class="form-group"><label>Электронная почта <span>*</span></label><input type="email" id="f-email" required></div>
-                    <div class="form-group"><label>Название организации</label><input type="text" id="f-company"></div>
-                    <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
-                    <button type="submit" class="btn-main">Продолжить</button>
+                    <div class="v4-group"><label>Имя *</label><input type="text" id="f-name" value="${dbName || ''}" required></div>
+                    <div class="v4-group"><label>Фамилия *</label><input type="text" id="f-surname" required></div>
+                    <div class="v4-group"><label>Email *</label><input type="email" id="f-email" required></div>
+                    <div class="v4-group"><label>Организация</label><input type="text" id="f-company"></div>
+                    <div class="v4-group"><label>Должность</label><input type="text" id="f-position"></div>
+                    <button type="submit" class="v4-btn">Продолжить</button>
                 </form>
             </div>
         `;
@@ -204,27 +140,24 @@
 
     function renderInstruction() {
         appDiv.innerHTML = `
-            <div class="card">
+            <div class="v4-card">
                 ${headerHTML}
-                <div style="text-align:left; color:#1e293b; line-height:1.5;">
-                    <h2 style="margin-bottom:15px; text-align:center;">Профильный Анализ Личности</h2>
-                    <p style="font-weight:700; margin-bottom:10px; color:var(--primary);">Добро пожаловать</p>
-                    <div style="font-size:14px; color:#475569; margin-bottom:20px;">
-                        <p style="margin-bottom:10px;">Профильный Анализ Личности создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
-                        <p style="margin-bottom:10px;"><b>Это не тест.</b> Здесь нет "правильных" или "неправильных" ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах.</p>
-                        <p style="margin-bottom:10px;">Первый ответ, который приходит Вам в голову, как правило, является самым точным. Постарайтесь отвечать спонтанно и честно.</p>
-                        <p>При заполнении анкеты думайте о себе на <b>текущей работе</b>.</p>
-                    </div>
-                    <p style="font-weight:700; margin-bottom:10px; color:var(--primary);">Инструкция</p>
-                    <div style="font-size:14px; color:#475569; background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
+                <div style="text-align:left; color:#1e293b; line-height:1.5; font-size:14px;">
+                    <p style="font-weight:700; color:var(--p); margin-bottom:10px;">Добро пожаловать</p>
+                    <p>Профильный Анализ Личности создан для определения стиля поведения в рабочей среде.</p>
+                    <p><b>Это не тест.</b> Здесь нет правильных или неправильных ответов. Результаты подчеркивают ваши сильные стороны.</p>
+                    <p>Отвечайте спонтанно. Думайте о себе на <b>текущей работе</b>.</p>
+                    
+                    <p style="font-weight:700; color:var(--p); margin-top:20px; margin-bottom:10px;">Инструкция</p>
+                    <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--b);">
                         <ol style="padding-left:20px; margin:0;">
                             <li style="margin-bottom:8px;">Выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
-                            <li style="margin-bottom:8px;">Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
-                            <li>Нажмите «Далее» для перехода к следующей группе.</li>
+                            <li style="margin-bottom:8px;">Выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
+                            <li>Нажмите «Далее».</li>
                         </ol>
                     </div>
                 </div>
-                <button class="btn-main" style="margin-top:25px;" onclick="window.startQuiz()">Начать заполнение</button>
+                <button class="v4-btn" style="margin-top:25px;" onclick="window.startQuiz()">Начать заполнение</button>
             </div>
         `;
     }
@@ -234,11 +167,12 @@
     window.select = (idx, type) => {
         if(!choices[currentIdx]) choices[currentIdx] = {};
         choices[currentIdx][type] = questions[currentIdx].options[idx].v;
+        const group = type === 'plus' ? 'p-' : 'm-';
         for(let i=0; i<4; i++) {
-            const el = document.getElementById((type==='plus'?'p-':'m-')+i);
+            const el = document.getElementById(group+i);
             if(el) el.classList.remove('active');
         }
-        document.getElementById((type==='plus'?'p-':'m-')+idx).classList.add('active');
+        document.getElementById(group+idx).classList.add('active');
         const btn = document.getElementById('next-btn');
         if(choices[currentIdx].plus && choices[currentIdx].minus) {
             btn.disabled = (choices[currentIdx].plus === choices[currentIdx].minus);
@@ -255,30 +189,30 @@
         const q = questions[currentIdx];
         const progress = (currentIdx / questions.length) * 100;
         appDiv.innerHTML = `
-            <div class="card">
+            <div class="v4-card">
                 ${headerHTML}
-                <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
-                <div class="word-grid">
+                <div class="v4-progress-w"><div class="v4-progress-b" style="width: ${progress}%"></div></div>
+                <div class="v4-grid">
                     ${q.options.map((opt, i) => `
-                        <div class="word-item">
+                        <div class="v4-item">
                             <span style="font-weight:500;">${opt.t}</span>
                             <div style="display:flex; gap:8px;">
-                                <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
-                                <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
+                                <button class="v4-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
+                                <button class="v4-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
                             </div>
                         </div>
                     `).join('')}
                 </div>
                 <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:12px; color:#94a3b8;">Группа ${currentIdx+1} из 24</span>
-                    <button id="next-btn" class="btn-main" style="width:auto; padding:10px 20px; margin:0;" disabled onclick="window.goNext()">Далее</button>
+                    <button id="next-btn" class="v4-btn" style="width:auto; padding:10px 20px; margin:0;" disabled onclick="window.goNext()">Далее</button>
                 </div>
             </div>
         `;
     }
 
     async function finish() {
-        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение ответов...</p></div>';
+        appDiv.innerHTML = '<div class="v4-card"><div class="v4-loader"></div><p>Сохранение...</p></div>';
         const scores = choices.reduce((acc, curr) => {
             acc[curr.plus]++; acc[curr.minus]--; return acc;
         }, { D: 0, I: 0, S: 0, C: 0 });
@@ -286,11 +220,11 @@
             await updateDoc(doc(db, "tokens", userToken), { 
                 results: scores, userDetails: userData, used: true, finishedAt: new Date().toISOString() 
             });
-            appDiv.innerHTML = `<div class="card">${headerHTML}<div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div><h2>Готово!</h2><p>Данные успешно переданы. Спасибо за участие!</p></div>`;
+            appDiv.innerHTML = `<div class="v4-card">${headerHTML}<div style="color:var(--s); font-size: 50px; margin: 20px 0;">✓</div><h2>Готово!</h2><p>Данные переданы. Спасибо!</p></div>`;
         } catch (e) { showError("Ошибка сохранения."); }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
+    function showError(m) { appDiv.innerHTML = `<div class="v4-card"><h2>Ошибка</h2><p>${m}</p></div>`; }
     init();
 </script>
 </body>
