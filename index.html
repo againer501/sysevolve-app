@@ -25,31 +25,26 @@
         }
 
         .container { width: 100%; max-width: 650px; padding: 20px; }
-        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
 
-        /* Тот самый двухсторонний заголовок */
+        /* Обновленный заголовок: одинаковый размер и жирность */
         .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #e2e8f0; /* Линия для разделения */
+            border-bottom: 1px solid #e2e8f0;
         }
-        .header-left {
-            font-size: 16px;
-            font-weight: 700;
+        .header-left, .header-right {
+            font-size: 20px; /* Единый размер */
+            font-weight: 900; /* Единая жирность */
             color: var(--primary);
             text-transform: uppercase;
-        }
-        .header-right {
-            font-size: 22px;
-            font-weight: 900;
-            color: var(--primary);
             letter-spacing: 1px;
         }
 
-        h2 { text-align: center; font-size: 22px; margin-bottom: 25px; color: var(--primary); }
+        h2 { font-size: 22px; margin-bottom: 25px; color: var(--primary); }
         
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
@@ -81,7 +76,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card" style="text-align:center;"><div class="loader"></div><p>Загрузка системы...</p></div>
+    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
 </div>
 
 <script type="module">
@@ -100,7 +95,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Данные теста
     const questions = [
         { options: [{t:"Мягкий",v:"S"}, {t:"Убедительный",v:"I"}, {t:"Скромный",v:"C"}, {t:"Решительный",v:"D"}] },
         { options: [{t:"Послушный",v:"C"}, {t:"Жизнерадостный",v:"I"}, {t:"Настойчивый",v:"D"}, {t:"Миролюбивый",v:"S"}] },
@@ -134,10 +128,9 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
-    // Функция для генерации шапки, которую мы будем вставлять везде
     const headerHTML = `
         <div class="header-row">
-            <div class="header-left">ПРОФИЛЬ ЛИЧНОСТИ DISC</div>
+            <div class="header-left">Профиль личности DISC</div>
             <div class="header-right">SYSEVOLVE</div>
         </div>
     `;
@@ -146,7 +139,6 @@
         const params = new URLSearchParams(window.location.search);
         userToken = params.get('token');
         if (!userToken) return showError("Токен отсутствует.");
-
         try {
             const snap = await getDoc(doc(db, "tokens", userToken));
             if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
@@ -188,12 +180,11 @@
                 ${headerHTML}
                 <h2>Инструкция</h2>
                 <div class="instruction-text">
-                    <p>Это не тест на интеллект или способности, здесь нет правильных или неправильных ответов.</p>
-                    <p>Вам будет предложено 24 группы слов. Из каждой группы выберите <b>одно</b> слово, которое лучше всего описывает ваше поведение на работе (+), и <b>одно</b> слово, которое подходит вам меньше всего (-).</p>
+                    <p>Это не тест на интеллект. Выбирайте слова, которые лучше всего (+) и меньше всего (-) описывают вас на работе.</p>
                     <ul>
                         <li>Оценивайте себя только в рабочей ситуации.</li>
-                        <li>В каждой группе должен быть выбран один плюс и один минус.</li>
-                        <li>Не раздумывайте долго — первая реакция обычно самая точная.</li>
+                        <li>В каждой группе — один плюс и один минус.</li>
+                        <li>Первая реакция — самая точная.</li>
                     </ul>
                 </div>
                 <button class="btn-main" onclick="window.startQuiz()">Начать тестирование</button>
@@ -247,13 +238,12 @@
     };
 
     async function finish() {
-        appDiv.innerHTML = '<div class="card" style="text-align:center;"><div class="loader"></div><p>Сохранение...</p></div>';
+        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение...</p></div>';
         const scores = choices.reduce((acc, curr) => {
             acc[curr.plus]++;
             acc[curr.minus]--;
             return acc;
         }, { D: 0, I: 0, S: 0, C: 0 });
-
         try {
             await updateDoc(doc(db, "tokens", userToken), { 
                 results: scores, 
@@ -262,18 +252,16 @@
                 finishedAt: new Date().toISOString() 
             });
             appDiv.innerHTML = `
-                <div class="card" style="text-align:center;">
+                <div class="card">
                     ${headerHTML}
                     <div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div>
                     <h2>Готово!</h2>
-                    <p>Благодарим за участие, ${userData.name}. Данные переданы в Sysevolve.</p>
+                    <p>Благодарим за участие, ${userData.name}. Данные переданы.</p>
                 </div>`;
-        } catch (e) { showError("Ошибка сохранения."); }
+        } catch (e) { showError("Ошибка."); }
     }
 
-    function showError(m) { 
-        appDiv.innerHTML = `<div class="card" style="text-align:center;">${headerHTML}<h2>Ошибка</h2><p>${m}</p></div>`; 
-    }
+    function showError(m) { appDiv.innerHTML = `<div class="card">${headerHTML}<h2>Ошибка</h2><p>${m}</p></div>`; }
 
     init();
 </script>
