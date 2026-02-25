@@ -27,7 +27,6 @@
         .container { width: 100%; max-width: 650px; padding: 20px; }
         .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
 
-        /* Обновленный заголовок: одинаковый размер и жирность */
         .header-row {
             display: flex;
             justify-content: space-between;
@@ -36,12 +35,14 @@
             padding-bottom: 15px;
             border-bottom: 1px solid #e2e8f0;
         }
+        /* Идентичный стиль для обеих частей */
         .header-left, .header-right {
-            font-size: 20px; /* Единый размер */
-            font-weight: 900; /* Единая жирность */
+            font-family: 'Lato', sans-serif;
+            font-size: 18px; 
+            font-weight: 900; 
             color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         h2 { font-size: 22px; margin-bottom: 25px; color: var(--primary); }
@@ -128,9 +129,10 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
+    // Текст приведен к ВЕРХНЕМУ РЕГИСТРУ для баланса
     const headerHTML = `
         <div class="header-row">
-            <div class="header-left">Профиль личности DISC</div>
+            <div class="header-left">ПРОФИЛЬ ЛИЧНОСТИ DISC</div>
             <div class="header-right">SYSEVOLVE</div>
         </div>
     `;
@@ -194,34 +196,11 @@
 
     window.startQuiz = () => renderQuiz();
 
-    function renderQuiz() {
-        const q = questions[currentIdx];
-        const progress = (currentIdx / questions.length) * 100;
-        appDiv.innerHTML = `
-            <div class="card">
-                ${headerHTML}
-                <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
-                <div class="word-grid">
-                    ${q.options.map((opt, i) => `
-                        <div class="word-item">
-                            <span style="font-weight:600;">${opt.t}</span>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn-choice plus" id="p-${i}" onclick="select(${i}, 'plus')">+</button>
-                                <button class="btn-choice minus" id="m-${i}" onclick="select(${i}, 'minus')">-</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; color:#64748b;">Группа ${currentIdx+1} из ${questions.length}</span>
-                    <button id="next-btn" class="btn-main" style="width:auto; padding:10px 30px; margin:0;" disabled onclick="window.goNext()">Далее</button>
-                </div>
-            </div>
-        `;
-    }
-
     window.select = (idx, type) => {
-        for(let i=0; i<4; i++) document.getElementById((type==='plus'?'p-':'m-')+i).classList.remove('active');
+        for(let i=0; i<4; i++) {
+            const el = document.getElementById((type==='plus'?'p-':'m-')+i);
+            if(el) el.classList.remove('active');
+        }
         document.getElementById((type==='plus'?'p-':'m-')+idx).classList.add('active');
         if(!choices[currentIdx]) choices[currentIdx] = {};
         choices[currentIdx][type] = questions[currentIdx].options[idx].v;
@@ -236,6 +215,32 @@
         if (currentIdx < questions.length) renderQuiz();
         else finish();
     };
+
+    function renderQuiz() {
+        const q = questions[currentIdx];
+        const progress = (currentIdx / questions.length) * 100;
+        appDiv.innerHTML = `
+            <div class="card">
+                ${headerHTML}
+                <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
+                <div class="word-grid">
+                    ${q.options.map((opt, i) => `
+                        <div class="word-item">
+                            <span style="font-weight:600;">${opt.t}</span>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
+                                <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:#64748b;">Группа ${currentIdx+1} из ${questions.length}</span>
+                    <button id="next-btn" class="btn-main" style="width:auto; padding:10px 30px; margin:0;" disabled onclick="window.goNext()">Далее</button>
+                </div>
+            </div>
+        `;
+    }
 
     async function finish() {
         appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение...</p></div>';
