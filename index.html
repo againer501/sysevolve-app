@@ -27,37 +27,36 @@
         .container { width: 100%; max-width: 650px; padding: 20px; }
         .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
-        /* Стили нового двухстороннего заголовка */
+        /* Тот самый двухсторонний заголовок */
         .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            border-bottom: 1px solid #e2e8f0;
             padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0; /* Линия для разделения */
         }
         .header-left {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 700;
-            color: #64748b;
+            color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         .header-right {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 900;
             color: var(--primary);
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
         }
 
         h2 { text-align: center; font-size: 22px; margin-bottom: 25px; color: var(--primary); }
         
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
         label span { color: #dc3545; }
         input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; font-family: inherit; }
         
-        .instruction-text { line-height: 1.6; font-size: 15px; color: #334155; }
+        .instruction-text { line-height: 1.6; font-size: 15px; color: #334155; text-align: left; }
         .instruction-text p { margin-bottom: 15px; }
         .instruction-text ul { padding-left: 20px; margin-bottom: 20px; }
         .instruction-text li { margin-bottom: 8px; }
@@ -71,7 +70,7 @@
         
         .word-grid { display: grid; gap: 10px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; }
-        .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.2s; }
+        .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.2s; font-family: inherit; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         
@@ -101,6 +100,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Данные теста
     const questions = [
         { options: [{t:"Мягкий",v:"S"}, {t:"Убедительный",v:"I"}, {t:"Скромный",v:"C"}, {t:"Решительный",v:"D"}] },
         { options: [{t:"Послушный",v:"C"}, {t:"Жизнерадостный",v:"I"}, {t:"Настойчивый",v:"D"}, {t:"Миролюбивый",v:"S"}] },
@@ -134,12 +134,13 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
-    // Общий шаблон заголовка
-    const getHeaderHTML = () => `
+    // Функция для генерации шапки, которую мы будем вставлять везде
+    const headerHTML = `
         <div class="header-row">
             <div class="header-left">ПРОФИЛЬ ЛИЧНОСТИ DISC</div>
             <div class="header-right">SYSEVOLVE</div>
-        </div>`;
+        </div>
+    `;
 
     async function init() {
         const params = new URLSearchParams(window.location.search);
@@ -156,7 +157,7 @@
     function renderForm(dbName) {
         appDiv.innerHTML = `
             <div class="card">
-                ${getHeaderHTML()}
+                ${headerHTML}
                 <h2>Регистрация</h2>
                 <form id="reg-form">
                     <div class="form-group"><label>Имя <span>*</span></label><input type="text" id="f-name" value="${dbName || ''}" required></div>
@@ -184,15 +185,15 @@
     function renderInstruction() {
         appDiv.innerHTML = `
             <div class="card">
-                ${getHeaderHTML()}
+                ${headerHTML}
                 <h2>Инструкция</h2>
                 <div class="instruction-text">
-                    <p>Это не тест на интеллект, здесь нет правильных ответов.</p>
-                    <p>Вам будет предложено 24 группы слов. Из каждой группы выберите <b>одно</b> слово (+), которое лучше всего описывает вас на работе, и <b>одно</b> слово (-), которое подходит меньше всего.</p>
+                    <p>Это не тест на интеллект или способности, здесь нет правильных или неправильных ответов.</p>
+                    <p>Вам будет предложено 24 группы слов. Из каждой группы выберите <b>одно</b> слово, которое лучше всего описывает ваше поведение на работе (+), и <b>одно</b> слово, которое подходит вам меньше всего (-).</p>
                     <ul>
                         <li>Оценивайте себя только в рабочей ситуации.</li>
-                        <li>В каждой группе выберите ровно один плюс и один минус.</li>
-                        <li>Первая реакция — самая точная.</li>
+                        <li>В каждой группе должен быть выбран один плюс и один минус.</li>
+                        <li>Не раздумывайте долго — первая реакция обычно самая точная.</li>
                     </ul>
                 </div>
                 <button class="btn-main" onclick="window.startQuiz()">Начать тестирование</button>
@@ -207,7 +208,7 @@
         const progress = (currentIdx / questions.length) * 100;
         appDiv.innerHTML = `
             <div class="card">
-                ${getHeaderHTML()}
+                ${headerHTML}
                 <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
@@ -246,7 +247,7 @@
     };
 
     async function finish() {
-        appDiv.innerHTML = '<div class="card" style="text-align:center;"><div class="loader"></div><p>Сохранение результатов...</p></div>';
+        appDiv.innerHTML = '<div class="card" style="text-align:center;"><div class="loader"></div><p>Сохранение...</p></div>';
         const scores = choices.reduce((acc, curr) => {
             acc[curr.plus]++;
             acc[curr.minus]--;
@@ -262,15 +263,17 @@
             });
             appDiv.innerHTML = `
                 <div class="card" style="text-align:center;">
-                    ${getHeaderHTML()}
-                    <div style="color:var(--secondary); font-size: 40px; margin: 20px 0;">✓</div>
-                    <h2>Тестирование завершено</h2>
-                    <p>Благодарим за участие, ${userData.name}. Ваши данные успешно переданы экспертам Sysevolve.</p>
+                    ${headerHTML}
+                    <div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div>
+                    <h2>Готово!</h2>
+                    <p>Благодарим за участие, ${userData.name}. Данные переданы в Sysevolve.</p>
                 </div>`;
-        } catch (e) { showError("Ошибка при сохранении."); }
+        } catch (e) { showError("Ошибка сохранения."); }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card" style="text-align:center;">${getHeaderHTML()}<h2>⚠</h2><p>${m}</p></div>`; }
+    function showError(m) { 
+        appDiv.innerHTML = `<div class="card" style="text-align:center;">${headerHTML}<h2>Ошибка</h2><p>${m}</p></div>`; 
+    }
 
     init();
 </script>
