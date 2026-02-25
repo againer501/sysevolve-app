@@ -32,75 +32,79 @@
         
         .card { 
             background: white; 
-            padding: 35px 30px; 
-            border-radius: 20px; 
+            padding: 40px 30px; 
+            border-radius: 24px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.04); 
             text-align: center; 
         }
 
-        /* НОВАЯ ВЕРТИКАЛЬНАЯ ШАПКА */
+        /* ЦЕНТРИРОВАННАЯ ШАПКА */
         .header-block {
             display: flex;
-            flex-direction: column; /* Элементы друг под другом */
-            align-items: flex-start; /* Выравнивание по левому краю */
-            margin-bottom: 25px;
+            flex-direction: column;
+            align-items: center; /* Всё по центру */
+            margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
         }
 
+        .logo-container {
+            margin-bottom: 15px;
+        }
+
         .logo-img {
-            height: 42px; /* Оптимальная высота */
+            height: 45px; /* Высота логотипа */
             width: auto;
-            margin-bottom: 12px; /* Отступ до текста */
             display: block;
+            margin: 0 auto;
+        }
+
+        /* Если картинка не подгрузится, этот текст будет аккуратным */
+        .brand-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 8px;
         }
 
         .header-title {
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 18px; /* Больше акцента на названии теста */
+            font-weight: 800;
             color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            text-align: left;
-            line-height: 1.2;
+            line-height: 1.3;
         }
 
-        /* Адаптация для мобильных */
         @media (max-width: 480px) {
-            .card { padding: 25px 20px; }
+            .card { padding: 30px 20px; }
+            .header-title { font-size: 16px; }
+            .brand-name { font-size: 11px; }
             .logo-img { height: 38px; }
-            .header-title { font-size: 13px; }
-            h2 { font-size: 20px; margin: 15px 0; }
         }
 
-        /* Стили формы */
+        /* Остальные стили */
         h2 { font-size: 22px; margin-bottom: 25px; color: var(--primary); font-weight: 600; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
         label span { color: #ef4444; }
-        
-        input { 
-            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; 
-            box-sizing: border-box; font-size: 16px; font-family: inherit;
-        }
+        input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; box-sizing: border-box; font-size: 16px; font-family: inherit; }
         
         .btn-main { 
             width: 100%; background: var(--primary); color: white; border: none; 
-            padding: 16px; border-radius: 10px; cursor: pointer; 
+            padding: 18px; border-radius: 12px; cursor: pointer; 
             font-weight: 700; font-size: 15px; text-transform: uppercase; 
             letter-spacing: 1px; font-family: inherit; margin-top: 15px;
-            transition: background 0.2s;
         }
-        .btn-main:hover { background: #1a3261; }
 
-        .progress-container { height: 6px; background: var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .progress-container { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
-        
         .word-grid { display: grid; gap: 10px; }
-        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border: 1px solid var(--border); border-radius: 12px; }
-        .word-item span { font-weight: 500; font-size: 15px; }
-
-        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-weight: 600; font-size: 18px; font-family: inherit; transition: 0.2s; }
+        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid var(--border); border-radius: 14px; }
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-weight: 600; font-size: 18px; font-family: inherit; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         
@@ -111,7 +115,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+    <div class="card"><div class="loader"></div><p>Загрузка...</p></div>
 </div>
 
 <script type="module">
@@ -163,9 +167,13 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
+    // ШАПКА С ПРАВИЛЬНЫМИ АКЦЕНТАМИ
     const headerHTML = `
         <div class="header-block">
-            <img src="Рисунок1.jpg" alt="Sysevolve" class="logo-img">
+            <div class="logo-container">
+                <img src="Рисунок1.jpg" alt="" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="brand-name" style="display:none;">SYSEVOLVE</div>
+            </div>
             <div class="header-title">Профиль личности DISC</div>
         </div>
     `;
@@ -199,10 +207,8 @@
         document.getElementById('reg-form').onsubmit = (e) => {
             e.preventDefault();
             userData = {
-                name: document.getElementById('f-name').value,
-                surname: document.getElementById('f-surname').value,
-                email: document.getElementById('f-email').value,
-                company: document.getElementById('f-company').value,
+                name: document.getElementById('f-name').value, surname: document.getElementById('f-surname').value,
+                email: document.getElementById('f-email').value, company: document.getElementById('f-company').value,
                 position: document.getElementById('f-position').value
             };
             renderInstruction();
@@ -214,11 +220,11 @@
             <div class="card">
                 ${headerHTML}
                 <h2>Инструкция</h2>
-                <div class="instruction-text" style="text-align:left; font-size:15px; line-height:1.6;">
+                <div style="text-align:left; line-height:1.6; font-size:15px; color:#475569;">
                     <p>Это не тест на интеллект. Выбирайте слова, которые <b>больше всего (+)</b> и <b>меньше всего (-)</b> описывают вас на работе.</p>
                     <ul>
                         <li>Оценивайте себя только в рабочей ситуации.</li>
-                        <li>В каждой группе выберите ровно один плюс и один минус.</li>
+                        <li>В каждой группе — один плюс и один минус.</li>
                     </ul>
                 </div>
                 <button class="btn-main" onclick="window.startQuiz()">Начать тест</button>
@@ -258,7 +264,7 @@
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
-                            <span>${opt.t}</span>
+                            <span style="font-weight:500;">${opt.t}</span>
                             <div style="display:flex; gap:8px;">
                                 <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
                                 <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
@@ -275,31 +281,19 @@
     }
 
     async function finish() {
-        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение результатов...</p></div>';
+        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение...</p></div>';
         const scores = choices.reduce((acc, curr) => {
-            acc[curr.plus]++;
-            acc[curr.minus]--;
-            return acc;
+            acc[curr.plus]++; acc[curr.minus]--; return acc;
         }, { D: 0, I: 0, S: 0, C: 0 });
         try {
             await updateDoc(doc(db, "tokens", userToken), { 
-                results: scores, 
-                userDetails: userData,
-                used: true, 
-                finishedAt: new Date().toISOString() 
+                results: scores, userDetails: userData, used: true, finishedAt: new Date().toISOString() 
             });
-            appDiv.innerHTML = `
-                <div class="card">
-                    ${headerHTML}
-                    <div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div>
-                    <h2>Готово!</h2>
-                    <p style="color:#64748b;">Ваши ответы успешно сохранены. Благодарим за участие!</p>
-                </div>`;
+            appDiv.innerHTML = `<div class="card">${headerHTML}<h2 style="color:var(--secondary);">Готово!</h2><p>Ваши результаты успешно переданы.</p></div>`;
         } catch (e) { showError("Ошибка сохранения."); }
     }
 
     function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
-
     init();
 </script>
 </body>
