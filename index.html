@@ -1,31 +1,278 @@
-<style>
-    /* ... (предыдущие стили остаются без изменений) ... */
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sysevolve | Профильный анализ личности</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #244381; 
+            --secondary: #8DC53F; 
+            --bg: #f4f7f6; 
+            --text: #1e293b; 
+        }
+        
+        body { 
+            font-family: 'Lato', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
 
-    .header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #e2e8f0;
+        .container { width: 100%; max-width: 650px; padding: 20px; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
+
+        /* ИСПРАВЛЕННЫЙ ЗАГОЛОВОК: Одинаковый размер и толщина */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .header-left, .header-right {
+            font-size: 18px; /* Оптимальный размер для обеих фраз */
+            font-weight: 900; /* Максимальная толщина Lato */
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            line-height: 1;
+        }
+
+        h2 { font-size: 22px; margin-bottom: 25px; color: var(--primary); font-weight: 700; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        label span { color: #dc3545; }
+        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; font-family: 'Lato', sans-serif; }
+        
+        .instruction-text { line-height: 1.6; font-size: 15px; color: #334155; text-align: left; }
+        .instruction-text p { margin-bottom: 15px; }
+        .instruction-text ul { padding-left: 20px; margin-bottom: 20px; }
+        .instruction-text li { margin-bottom: 8px; }
+
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 16px; transition: 0.3s; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; font-family: 'Lato', sans-serif; }
+        .btn-main:hover { background: #1a3261; }
+        .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        .progress-container { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 25px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
+        
+        .word-grid { display: grid; gap: 10px; }
+        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; }
+        .btn-choice { border: 1px solid #cbd5e1; background: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.2s; }
+        .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
+        .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
+        
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div id="app" class="container">
+    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC7hWzafvWz28vSGzG9RakaUSr375VmA-o",
+        authDomain: "sysevolve-platform.firebaseapp.com",
+        projectId: "sysevolve-platform",
+        storageBucket: "sysevolve-platform.firebasestorage.app",
+        messagingSenderId: "1087336122097",
+        appId: "1:1087336122097:web:a2f724106e23f82deccb50"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const questions = [
+        { options: [{t:"Мягкий",v:"S"}, {t:"Убедительный",v:"I"}, {t:"Скромный",v:"C"}, {t:"Решительный",v:"D"}] },
+        { options: [{t:"Послушный",v:"C"}, {t:"Жизнерадостный",v:"I"}, {t:"Настойчивый",v:"D"}, {t:"Миролюбивый",v:"S"}] },
+        { options: [{t:"Привлекательный",v:"I"}, {t:"Придирчивый",v:"C"}, {t:"Упрямый",v:"D"}, {t:"Спокойный",v:"S"}] },
+        { options: [{t:"Предупредительный",v:"S"}, {t:"Открытый",v:"I"}, {t:"Волевой",v:"D"}, {t:"Вежливый",v:"C"}] },
+        { options: [{t:"Предприимчивый",v:"D"}, {t:"Довольный",v:"S"}, {t:"Общительный",v:"I"}, {t:"Сдержанный",v:"C"}] },
+        { options: [{t:"Кроткий",v:"S"}, {t:"Убежденный",v:"D"}, {t:"Добродушный",v:"I"}, {t:"Аккуратный",v:"C"}] },
+        { options: [{t:"Выразительный",v:"I"}, {t:"Осторожный",v:"C"}, {t:"Сильный",v:"D"}, {t:"Уступчивый",v:"S"}] },
+        { options: [{t:"Доброжелательный",v:"I"}, {t:"Скрупулезный",v:"C"}, {t:"Уверенный",v:"D"}, {t:"Снисходительный",v:"S"}] },
+        { options: [{t:"Деликатный",v:"C"}, {t:"Аргументирующий",v:"D"}, {t:"Адаптивный",v:"S"}, {t:"Веселый",v:"I"}] },
+        { options: [{t:"Агрессивный",v:"D"}, {t:"Душа компании",v:"I"}, {t:"Дружелюбный",v:"S"}, {t:"Боязливый",v:"C"}] },
+        { options: [{t:"Осторожный",v:"C"}, {t:"Решительный",v:"D"}, {t:"Обаятельный",v:"I"}, {t:"Покладистый",v:"S"}] },
+        { options: [{t:"Уверенный",v:"I"}, {t:"Дисциплинированный",v:"C"}, {t:"Щедрый",v:"S"}, {t:"Напористый",v:"D"}] },
+        { options: [{t:"Требовательный",v:"D"}, {t:"Эмоциональный",v:"I"}, {t:"Преданный",v:"S"}, {t:"Исполнительный",v:"C"}] },
+        { options: [{t:"Приятный",v:"I"}, {t:"Точный",v:"C"}, {t:"Прямолинейный",v:"D"}, {t:"Уравновешенный",v:"S"}] },
+        { options: [{t:"Нетерпеливый",v:"D"}, {t:"Радивый",v:"C"}, {t:"Убеждающий",v:"I"}, {t:"Мирный",v:"S"}] },
+        { options: [{t:"Логичный",v:"C"}, {t:"Смелый",v:"D"}, {t:"Верный",v:"S"}, {t:"Популярный",v:"I"}] },
+        { options: [{t:"Выдержанный",v:"S"}, {t:"Готовый к риску",v:"D"}, {t:"Красноречивый",v:"I"}, {t:"Тактичный",v:"C"}] },
+        { options: [{t:"Властный",v:"D"}, {t:"Влиятельный",v:"I"}, {t:"Покладистый",v:"S"}, {t:"Скромный",v:"C"}] },
+        { options: [{t:"Уважительный",v:"C"}, {t:"Новаторский",v:"D"}, {t:"Оптимистичный",v:"I"}, {t:"Услужливый",v:"S"}] },
+        { options: [{t:"Дипломатичный",v:"C"}, {t:"Удовлетворенный",v:"S"}, {t:"Энергичный",v:"D"}, {t:"Вдохновляющий",v:"I"}] },
+        { options: [{t:"Дисциплинированный",v:"C"}, {t:"Смелый",v:"D"}, {t:"Верный",v:"S"}, {t:"Популярный",v:"I"}] },
+        { options: [{t:"Мягкий",v:"S"}, {t:"Убедительный",v:"I"}, {t:"Скромный",v:"C"}, {t:"Решительный",v:"D"}] },
+        { options: [{t:"Застенчивый",v:"C"}, {t:"Инициативный",v:"D"}, {t:"Стабильный",v:"S"}, {t:"Жизнерадостный",v:"I"}] },
+        { options: [{t:"Прямой",v:"D"}, {t:"Душевный",v:"S"}, {t:"Интересный",v:"I"}, {t:"Тщательный",v:"C"}] }
+    ];
+
+    let currentIdx = 0;
+    let userToken = "";
+    let userData = {};
+    let choices = [];
+    const appDiv = document.getElementById('app');
+
+    const headerHTML = `
+        <div class="header-row">
+            <div class="header-left">ПРОФИЛЬ ЛИЧНОСТИ DISC</div>
+            <div class="header-right">SYSEVOLVE</div>
+        </div>
+    `;
+
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        userToken = params.get('token');
+        if (!userToken) return showError("Токен отсутствует.");
+        try {
+            const snap = await getDoc(doc(db, "tokens", userToken));
+            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
+            renderForm(snap.data().name);
+        } catch (e) { showError("Ошибка сети."); }
     }
 
-    /* Принудительно устанавливаем одинаковую толщину и стиль для обеих сторон */
-    .header-left, .header-right {
-        font-family: 'Lato', sans-serif;
-        font-size: 20px;
-        font-weight: 900; /* Максимальная толщина для Lato */
-        color: var(--primary);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        line-height: 1.2;
+    function renderForm(dbName) {
+        appDiv.innerHTML = `
+            <div class="card">
+                ${headerHTML}
+                <h2>Регистрация</h2>
+                <form id="reg-form">
+                    <div class="form-group"><label>Имя <span>*</span></label><input type="text" id="f-name" value="${dbName || ''}" required></div>
+                    <div class="form-group"><label>Фамилия <span>*</span></label><input type="text" id="f-surname" required></div>
+                    <div class="form-group"><label>Электронная почта <span>*</span></label><input type="email" id="f-email" required></div>
+                    <div class="form-group"><label>Название организации</label><input type="text" id="f-company"></div>
+                    <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
+                    <button type="submit" class="btn-main">Продолжить</button>
+                </form>
+            </div>
+        `;
+        document.getElementById('reg-form').onsubmit = (e) => {
+            e.preventDefault();
+            userData = {
+                name: document.getElementById('f-name').value,
+                surname: document.getElementById('f-surname').value,
+                email: document.getElementById('f-email').value,
+                company: document.getElementById('f-company').value,
+                position: document.getElementById('f-position').value
+            };
+            renderInstruction();
+        };
     }
 
-    /* Убираем возможные отличия в цвете или прозрачности */
-    .header-left {
-        opacity: 1;
-        color: #244381; /* Тот же синий, что и у бренда */
+    function renderInstruction() {
+        appDiv.innerHTML = `
+            <div class="card">
+                ${headerHTML}
+                <h2>Инструкция</h2>
+                <div class="instruction-text">
+                    <p>Это не тест на интеллект. Выбирайте слова, которые лучше всего (+) и меньше всего (-) описывают вас на работе.</p>
+                    <ul>
+                        <li>Оценивайте себя только в рабочей ситуации.</li>
+                        <li>В каждой группе — один плюс и один минус.</li>
+                        <li>Первая реакция — самая точная.</li>
+                    </ul>
+                </div>
+                <button class="btn-main" id="start-quiz-btn">Начать тестирование</button>
+            </div>
+        `;
+        document.getElementById('start-quiz-btn').onclick = () => renderQuiz();
     }
 
-    /* ... (остальной CSS) ... */
-</style>
+    function renderQuiz() {
+        const q = questions[currentIdx];
+        const progress = (currentIdx / questions.length) * 100;
+        appDiv.innerHTML = `
+            <div class="card">
+                ${headerHTML}
+                <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
+                <div class="word-grid">
+                    ${q.options.map((opt, i) => `
+                        <div class="word-item">
+                            <span style="font-weight:600;">${opt.t}</span>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-choice plus" data-idx="${i}" data-type="plus">+</button>
+                                <button class="btn-choice minus" data-idx="${i}" data-type="minus">-</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:#64748b;">Группа ${currentIdx+1} из ${questions.length}</span>
+                    <button id="next-btn" class="btn-main" style="width:auto; padding:10px 30px; margin:0;" disabled>Далее</button>
+                </div>
+            </div>
+        `;
+
+        document.querySelectorAll('.btn-choice').forEach(btn => {
+            btn.onclick = () => {
+                const idx = parseInt(btn.dataset.idx);
+                const type = btn.dataset.type;
+                
+                // Снимаем активный класс с других кнопок того же типа (плюс или минус)
+                document.querySelectorAll(`.btn-choice.${type}`).forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                if(!choices[currentIdx]) choices[currentIdx] = {};
+                choices[currentIdx][type] = questions[currentIdx].options[idx].v;
+                
+                const nextBtn = document.getElementById('next-btn');
+                if(choices[currentIdx].plus && choices[currentIdx].minus) {
+                    nextBtn.disabled = (choices[currentIdx].plus === choices[currentIdx].minus);
+                }
+            };
+        });
+
+        document.getElementById('next-btn').onclick = () => {
+            currentIdx++;
+            if (currentIdx < questions.length) renderQuiz();
+            else finish();
+        };
+    }
+
+    async function finish() {
+        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение...</p></div>';
+        const scores = choices.reduce((acc, curr) => {
+            acc[curr.plus]++;
+            acc[curr.minus]--;
+            return acc;
+        }, { D: 0, I: 0, S: 0, C: 0 });
+        try {
+            await updateDoc(doc(db, "tokens", userToken), { 
+                results: scores, 
+                userDetails: userData,
+                used: true, 
+                finishedAt: new Date().toISOString() 
+            });
+            appDiv.innerHTML = `
+                <div class="card">
+                    ${headerHTML}
+                    <div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div>
+                    <h2>Готово!</h2>
+                    <p>Благодарим за участие, ${userData.name}. Данные переданы.</p>
+                </div>`;
+        } catch (e) { showError("Ошибка при сохранении."); }
+    }
+
+    function showError(m) { appDiv.innerHTML = `<div class="card">${headerHTML}<h2>Ошибка</h2><p>${m}</p></div>`; }
+
+    init();
+</script>
+</body>
+</html>
