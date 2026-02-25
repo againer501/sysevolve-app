@@ -21,7 +21,7 @@
             margin: 0; 
             display: flex; 
             justify-content: center; 
-            align-items: flex-start; /* Чтобы на мобильных не прилипало к центру */
+            align-items: flex-start; 
             min-height: 100vh; 
             padding: 20px 15px;
             box-sizing: border-box;
@@ -32,70 +32,44 @@
         
         .card { 
             background: white; 
-            padding: 30px; 
+            padding: 35px 30px; 
             border-radius: 20px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.04); 
             text-align: center; 
         }
 
-        /* ИСПРАВЛЕННАЯ ШАПКА */
-        .header-row {
+        /* НОВАЯ ВЕРТИКАЛЬНАЯ ШАПКА */
+        .header-block {
             display: flex;
-            justify-content: space-between;
-            align-items: center; /* Центрирование по вертикали */
-            flex-wrap: wrap; /* ГЛАВНОЕ: позволяет элементам переноситься, а не сжиматься */
-            gap: 10px;
+            flex-direction: column; /* Элементы друг под другом */
+            align-items: flex-start; /* Выравнивание по левому краю */
             margin-bottom: 25px;
-            padding-bottom: 15px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
         }
 
-        .header-left {
+        .logo-img {
+            height: 42px; /* Оптимальная высота */
+            width: auto;
+            margin-bottom: 12px; /* Отступ до текста */
+            display: block;
+        }
+
+        .header-title {
             font-size: 14px;
             font-weight: 700;
             color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: left;
-            flex: 1 1 auto; /* Растягивается, но не ломается */
-            min-width: 150px; /* Чтобы не сжималось в кашу */
-            white-space: nowrap; /* Запрещаем перенос внутри фразы на десктопе */
+            line-height: 1.2;
         }
 
-        .header-right {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            text-align: right;
-        }
-
-        /* АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ */
+        /* Адаптация для мобильных */
         @media (max-width: 480px) {
-            .card { padding: 25px 15px; }
-            
-            .header-row {
-                flex-direction: column; /* На узких экранах ставим друг под друга */
-                align-items: center; 
-                text-align: center;
-                gap: 5px;
-            }
-
-            .header-left {
-                text-align: center;
-                font-size: 12px;
-                white-space: normal; /* На мобильных разрешаем аккуратный перенос по словам */
-                line-height: 1.4;
-                order: 2; /* Текст профиля ниже названия компании */
-            }
-
-            .header-right {
-                text-align: center;
-                font-size: 18px;
-                order: 1; /* SYSEVOLVE выше */
-                margin-bottom: 5px;
-            }
-
+            .card { padding: 25px 20px; }
+            .logo-img { height: 38px; }
+            .header-title { font-size: 13px; }
             h2 { font-size: 20px; margin: 15px 0; }
         }
 
@@ -115,14 +89,18 @@
             padding: 16px; border-radius: 10px; cursor: pointer; 
             font-weight: 700; font-size: 15px; text-transform: uppercase; 
             letter-spacing: 1px; font-family: inherit; margin-top: 15px;
+            transition: background 0.2s;
         }
+        .btn-main:hover { background: #1a3261; }
 
-        /* Тестовая часть */
         .progress-container { height: 6px; background: var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--secondary); transition: width 0.4s ease; }
+        
         .word-grid { display: grid; gap: 10px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border: 1px solid var(--border); border-radius: 12px; }
-        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-weight: 600; font-size: 18px; font-family: inherit; }
+        .word-item span { font-weight: 500; font-size: 15px; }
+
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-weight: 600; font-size: 18px; font-family: inherit; transition: 0.2s; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         
@@ -186,9 +164,9 @@
     const appDiv = document.getElementById('app');
 
     const headerHTML = `
-        <div class="header-row">
-            <div class="header-left">Профиль личности DISC</div>
-            <div class="header-right">SYSEVOLVE</div>
+        <div class="header-block">
+            <img src="Рисунок1.jpg" alt="Sysevolve" class="logo-img">
+            <div class="header-title">Профиль личности DISC</div>
         </div>
     `;
 
@@ -243,7 +221,7 @@
                         <li>В каждой группе выберите ровно один плюс и один минус.</li>
                     </ul>
                 </div>
-                <button class="btn-main" onclick="window.startQuiz()">Начать</button>
+                <button class="btn-main" onclick="window.startQuiz()">Начать тест</button>
             </div>
         `;
     }
@@ -280,7 +258,7 @@
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
-                            <span style="font-weight:500;">${opt.t}</span>
+                            <span>${opt.t}</span>
                             <div style="display:flex; gap:8px;">
                                 <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
                                 <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
