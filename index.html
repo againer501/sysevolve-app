@@ -24,10 +24,9 @@
             min-height: 100vh; 
         }
 
-        .container { width: 100%; max-width: 650px; padding: 20px; }
+        .container { width: 100%; max-width: 650px; padding: 20px; box-sizing: border-box; }
         .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
 
-        /* ИСПРАВЛЕННЫЙ ЗАГОЛОВОК: Одинаковый размер и толщина */
         .header-row {
             display: flex;
             justify-content: space-between;
@@ -36,13 +35,14 @@
             padding-bottom: 15px;
             border-bottom: 1px solid #e2e8f0;
         }
+
+        /* Одинаковая толщина и размер для обеих частей */
         .header-left, .header-right {
-            font-size: 18px; /* Оптимальный размер для обеих фраз */
-            font-weight: 900; /* Максимальная толщина Lato */
+            font-size: 18px;
+            font-weight: 900;
             color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
+            letter-spacing: 0.5px;
             line-height: 1;
         }
 
@@ -78,7 +78,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+    <div class="card"><div class="loader"></div><p>Загрузка...</p></div>
 </div>
 
 <script type="module">
@@ -145,7 +145,11 @@
             const snap = await getDoc(doc(db, "tokens", userToken));
             if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
             renderForm(snap.data().name);
-        } catch (e) { showError("Ошибка сети."); }
+        } catch (e) { showError("Ошибка связи с базой данных."); }
+    }
+
+    function showError(m) { 
+        appDiv.innerHTML = `<div class="card">${headerHTML}<h2>Ошибка</h2><p>${m}</p></div>`; 
     }
 
     function renderForm(dbName) {
@@ -163,7 +167,7 @@
                 </form>
             </div>
         `;
-        document.getElementById('reg-form').onsubmit = (e) => {
+        document.getElementById('reg-form').addEventListener('submit', (e) => {
             e.preventDefault();
             userData = {
                 name: document.getElementById('f-name').value,
@@ -173,7 +177,7 @@
                 position: document.getElementById('f-position').value
             };
             renderInstruction();
-        };
+        });
     }
 
     function renderInstruction() {
@@ -182,17 +186,16 @@
                 ${headerHTML}
                 <h2>Инструкция</h2>
                 <div class="instruction-text">
-                    <p>Это не тест на интеллект. Выбирайте слова, которые лучше всего (+) и меньше всего (-) описывают вас на работе.</p>
+                    <p>Вам будет предложено 24 группы слов. Из каждой группы выберите <b>одно</b> слово, которое лучше всего описывает вас на работе (+), и <b>одно</b> слово, которое подходит меньше всего (-).</p>
                     <ul>
                         <li>Оценивайте себя только в рабочей ситуации.</li>
-                        <li>В каждой группе — один плюс и один минус.</li>
-                        <li>Первая реакция — самая точная.</li>
+                        <li>В каждой группе выберите ровно один плюс и один минус.</li>
                     </ul>
                 </div>
                 <button class="btn-main" id="start-quiz-btn">Начать тестирование</button>
             </div>
         `;
-        document.getElementById('start-quiz-btn').onclick = () => renderQuiz();
+        document.getElementById('start-quiz-btn').addEventListener('click', () => renderQuiz());
     }
 
     function renderQuiz() {
@@ -221,13 +224,12 @@
         `;
 
         document.querySelectorAll('.btn-choice').forEach(btn => {
-            btn.onclick = () => {
-                const idx = parseInt(btn.dataset.idx);
-                const type = btn.dataset.type;
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(e.target.dataset.idx);
+                const type = e.target.dataset.type;
                 
-                // Снимаем активный класс с других кнопок того же типа (плюс или минус)
                 document.querySelectorAll(`.btn-choice.${type}`).forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+                e.target.classList.add('active');
                 
                 if(!choices[currentIdx]) choices[currentIdx] = {};
                 choices[currentIdx][type] = questions[currentIdx].options[idx].v;
@@ -236,14 +238,14 @@
                 if(choices[currentIdx].plus && choices[currentIdx].minus) {
                     nextBtn.disabled = (choices[currentIdx].plus === choices[currentIdx].minus);
                 }
-            };
+            });
         });
 
-        document.getElementById('next-btn').onclick = () => {
+        document.getElementById('next-btn').addEventListener('click', () => {
             currentIdx++;
             if (currentIdx < questions.length) renderQuiz();
             else finish();
-        };
+        });
     }
 
     async function finish() {
@@ -267,11 +269,10 @@
                     <h2>Готово!</h2>
                     <p>Благодарим за участие, ${userData.name}. Данные переданы.</p>
                 </div>`;
-        } catch (e) { showError("Ошибка при сохранении."); }
+        } catch (e) { showError("Ошибка сохранения результатов."); }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card">${headerHTML}<h2>Ошибка</h2><p>${m}</p></div>`; }
-
+    // Запуск приложения
     init();
 </script>
 </body>
