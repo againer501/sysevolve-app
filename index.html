@@ -11,11 +11,16 @@
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
         
-        .brand-header { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 2px solid #f1f5f9; }
-        .brand-logo-img { max-height: 80px; width: auto; display: block; margin: 0 auto 15px; }
-        .brand-title { font-size: 16px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        /* УМЕНЬШЕННАЯ ШАПКА */
+        .brand-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
+        .brand-logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto 10px; }
+        .brand-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        @media (max-width: 480px) { .card { padding: 25px 15px; } .brand-title { font-size: 13px; } .brand-logo-img { max-height: 60px; } }
+        @media (max-width: 480px) { 
+            .card { padding: 20px 15px; } 
+            .brand-title { font-size: 12px; } 
+            .brand-logo-img { max-height: 38px; } 
+        }
 
         h2 { font-size: 20px; color: var(--primary); margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; text-align: left; }
@@ -37,12 +42,11 @@
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Стили для инструкции как на скриншоте */
         .instr-text { text-align: left; font-size: 14px; line-height: 1.6; color: #1e293b; }
         .instr-text h3 { color: #8DC53F; font-size: 18px; margin-bottom: 10px; }
-        .instr-text h4 { color: #244381; font-size: 20px; margin: 20px 0 10px 0; }
-        .instr-list { padding-left: 25px; }
-        .instr-list li { margin-bottom: 10px; }
+        .instr-text h4 { color: #244381; font-size: 18px; margin: 15px 0 10px 0; }
+        .instr-list { padding-left: 20px; }
+        .instr-list li { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -100,7 +104,6 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
-    // Хедер с логотипом logo.jpg
     const headerHTML = `
         <header class="brand-header">
             <img src="logo.jpg" alt="SYSEVOLVE" class="brand-logo-img" 
@@ -156,19 +159,18 @@
                     <h3>Профильный Анализ Личности</h3>
                     <h4>Добро пожаловать</h4>
                     <p>Профильный Анализ Личности создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
-                    <p><b>Это не тест.</b> Здесь нет 'правильных' или 'неправильных' ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах в работе и дают полезную информацию, которая поможет Вам лучше соответствовать требованиям рабочей среды.</p>
-                    <p>Первый ответ, который приходит Вам в голову, как правило, является самым точным. Анкету необходимо заполнять в одиночестве и не отвлекаясь. Постарайтесь отвечать спонтанно и честно.</p>
-                    <p>При заполнении анкеты Профильного Анализа Личности <b>думайте о себе на текущей работе</b>; если Вы не работаете, думайте о себе на последнем месте работы. Если вы никогда не работали, то - о себе дома.</p>
+                    <p><b>Это не тест.</b> Здесь нет 'правильных' или 'неправильных' ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах в работе.</p>
+                    <p>Анкету необходимо заполнять в одиночестве и не отвлекаясь. Постарайтесь отвечать спонтанно и честно.</p>
+                    <p>При заполнении анкеты <b>думайте о себе на текущей работе</b>; если Вы не работаете, думайте о себе на последнем месте работы. Если никогда не работали — о себе дома.</p>
                     
                     <h4>Инструкция</h4>
-                    <p>Каждая часть оценки содержит два ряда по четыре описательных слова.</p>
                     <ol class="instr-list">
-                        <li>В первом ряду выберите слово, которое <b>НАИБОЛЕЕ</b> характеризует Вас, нажав на него.</li>
-                        <li>Во втором ряду выберите слово, которое <b>НАИМЕНЕЕ</b> характеризует Вас, нажав на слово.</li>
-                        <li>Вы автоматически перейдете к следующему вопросу. Повторяйте шаги 1 и 2 пока не дадите ответы на все вопросы.</li>
+                        <li>Выберите слово, которое <b>НАИБОЛЕЕ</b> характеризует Вас.</li>
+                        <li>Затем выберите слово, которое <b>НАИМЕНЕЕ</b> характеризует Вас.</li>
+                        <li>Вы автоматически перейдете к следующему вопросу.</li>
                     </ol>
                 </div>
-                <button class="btn-main" style="margin-top:25px;" onclick="window.startQuiz()">Начать заполнение</button>
+                <button class="btn-main" style="margin-top:20px;" onclick="window.startQuiz()">Начать заполнение</button>
             </div>
         `;
     }
@@ -231,11 +233,11 @@
             await updateDoc(doc(db, "tokens", userToken), { 
                 results: scores, userDetails: userData, used: true, finishedAt: new Date().toISOString() 
             });
-            appDiv.innerHTML = `<div class="card">${headerHTML}<div style="color:var(--secondary); font-size: 60px; margin: 20px 0;">✓</div><h2>Готово!</h2><p>Ваши ответы успешно сохранены. Спасибо!</p></div>`;
+            appDiv.innerHTML = `<div class="card">${headerHTML}<div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div><h2>Завершено!</h2><p>Ваши данные успешно сохранены. Спасибо!</p></div>`;
         } catch (e) { showError("Ошибка сохранения."); }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Внимание</h2><p>${m}</p></div>`; }
+    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
     init();
 </script>
 </body>
