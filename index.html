@@ -11,7 +11,6 @@
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
         
-        /* УМЕНЬШЕННАЯ ШАПКА */
         .brand-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
         .brand-logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto 10px; }
         .brand-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -159,20 +158,18 @@
                     <h3>Профиль Личности DISC</h3>
                     <h4>Добро пожаловать</h4>
                     <p>Профиль Личности DISC создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
-                    <p><b>Это не тест.</b> Здесь нет 'правильных' или 'неправильных' ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах в работе и дают полезную информацию, которая поможет Вам лучше соответствоаать требованиям рабочей среды.</p>
-                    <p>Первый ответ, который приходит в голову, как правило, является самым точным. Анкету необходимо заполнять в одиночестве и не отвлекаясь. Постарайтесь отвечать откровенно и честно.<p>
-                    <p>При заполнении Анкеты Профильного Анализа Личности думайте о себе на текущей работе, если Вы - не работаете, думайте о себе на последнем месте работы. Если Вы никогда не работали, то - о себе дома.<p>
-
-                    <p>Анкету необходимо заполнять в одиночестве и не отвлекаясь. Постарайтесь отвечать спонтанно и честно.</p>
+                    <p><b>Это не тест.</b> Здесь нет 'правильных' или 'неправильных' ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах в работе и дают полезную информацию, которая поможет Вам лучше соответствовать требованиям рабочей среды.</p>
+                    <p>Первый ответ, который приходит в голову, как правило, является самым точным. Анкету необходимо заполнять в одиночестве и не отвлекаясь. Постарайтесь отвечать откровенно и честно.</p>
                     <p>При заполнении анкеты <b>думайте о себе на текущей работе</b>; если Вы не работаете, думайте о себе на последнем месте работы. Если никогда не работали — о себе дома.</p>
                     
-<h3 style="color:var(--primary); margin-top:20px;">Инструкция</h3>
+                    <h4>Инструкция</h4>
                     <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
-                        <ol style="padding-left:20px; margin:0;">
-                            <li style="margin-bottom:8px;">В каждой группе выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
-                            <li style="margin-bottom:8px;">Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
+                        <ol class="instr-list" style="margin:0;">
+                            <li>В каждой группе выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
+                            <li>Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
                             <li>Нажмите кнопку «Далее» для перехода к следующей группе.</li>
-                    </ol>
+                        </ol>
+                    </div>
                 </div>
                 <button class="btn-main" style="margin-top:20px;" onclick="window.startQuiz()">Начать заполнение</button>
             </div>
@@ -230,14 +227,33 @@
 
     async function finish() {
         appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение результатов...</p></div>';
-        const scores = choices.reduce((acc, curr) => {
-            acc[curr.plus]++; acc[curr.minus]--; return acc;
-        }, { D: 0, I: 0, S: 0, C: 0 });
+        
+        const graph1 = { D: 0, I: 0, S: 0, C: 0 };
+        const graph2 = { D: 0, I: 0, S: 0, C: 0 };
+        const graph3 = { D: 0, I: 0, S: 0, C: 0 };
+        
+        choices.forEach(c => {
+            if(c.plus) graph1[c.plus]++;
+            if(c.minus) graph2[c.minus]++;
+        });
+
+        for(let k in graph3) { graph3[k] = graph1[k] - graph2[k]; }
+
         try {
             await updateDoc(doc(db, "tokens", userToken), { 
-                results: scores, userDetails: userData, used: true, finishedAt: new Date().toISOString() 
+                results: { graph1, graph2, graph3 },
+                userDetails: userData, 
+                used: true, 
+                finishedAt: new Date().toISOString() 
             });
-            appDiv.innerHTML = `<div class="card">${headerHTML}<div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div><h2>Завершено!</h2><p>Ваши данные успешно сохранены. Спасибо!</p></div>`;
+            
+            appDiv.innerHTML = `
+                <div class="card">
+                    ${headerHTML}
+                    <div style="color:var(--secondary); font-size: 50px; margin: 15px 0;">✓</div>
+                    <h2>Завершено!</h2>
+                    <p>Ваши ответы успешно сохранены. Благодарим за участие!</p>
+                </div>`;
         } catch (e) { showError("Ошибка сохранения."); }
     }
 
@@ -246,6 +262,3 @@
 </script>
 </body>
 </html>
-
-
-
