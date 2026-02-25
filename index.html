@@ -11,27 +11,26 @@
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
         
-        /* ШАПКА */
         .brand-header { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 2px solid #f1f5f9; }
-        .brand-logo-img { max-height: 65px; width: auto; display: block; margin: 0 auto 15px; }
+        .brand-logo-img { max-height: 70px; width: auto; display: block; margin: 0 auto 15px; }
         .brand-title { font-size: 16px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
 
-        @media (max-width: 480px) { .card { padding: 25px 15px; } .brand-title { font-size: 13px; } .brand-logo-img { max-height: 50px; } }
+        @media (max-width: 480px) { .card { padding: 25px 15px; } .brand-title { font-size: 13px; } .brand-logo-img { max-height: 55px; } }
 
         h2 { font-size: 20px; color: var(--primary); margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
-        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
         
         .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
-        .btn-main:disabled { background: #cbd5e1; }
+        .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
 
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         
         .word-grid { display: grid; gap: 8px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
-        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-weight: 600; font-size: 18px; }
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         
@@ -42,7 +41,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+    <div class="card"><div class="loader"></div><p>Загрузка...</p></div>
 </div>
 
 <script type="module">
@@ -61,7 +60,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Вопросы DISC (сокращено для краткости кода, оставьте свой полный массив)
     const questions = [
         { options: [{t:"Мягкий",v:"S"}, {t:"Убедительный",v:"I"}, {t:"Скромный",v:"C"}, {t:"Решительный",v:"D"}] },
         { options: [{t:"Послушный",v:"C"}, {t:"Жизнерадостный",v:"I"}, {t:"Настойчивый",v:"D"}, {t:"Миролюбивый",v:"S"}] },
@@ -95,9 +93,11 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
+    // Хедер: Пытаемся загрузить logo.jpg, если нет - logo.png, если нет - внешнюю ссылку
     const headerHTML = `
         <header class="brand-header">
-            <img src="./Рисунок1.jpg" alt="SYSEVOLVE" class="brand-logo-img" onerror="this.style.display='none';">
+            <img src="./logo.jpg" alt="Logo" class="brand-logo-img" id="main-logo" 
+                 onerror="this.onerror=null; this.src='./logo.png'; this.onerror=function(){this.src='https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media';}">
             <div class="brand-title">Профильный Анализ Личности DISC</div>
         </header>
     `;
@@ -121,8 +121,8 @@
                 <form id="reg-form">
                     <div class="form-group"><label>Имя *</label><input type="text" id="f-name" value="${dbName || ''}" required></div>
                     <div class="form-group"><label>Фамилия *</label><input type="text" id="f-surname" required></div>
-                    <div class="form-group"><label>Email *</label><input type="email" id="f-email" required></div>
-                    <div class="form-group"><label>Организация</label><input type="text" id="f-company"></div>
+                    <div class="form-group"><label>Электронная почта *</label><input type="email" id="f-email" required></div>
+                    <div class="form-group"><label>Название организации</label><input type="text" id="f-company"></div>
                     <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
                     <button type="submit" class="btn-main">Продолжить</button>
                 </form>
@@ -131,8 +131,10 @@
         document.getElementById('reg-form').onsubmit = (e) => {
             e.preventDefault();
             userData = {
-                name: document.getElementById('f-name').value, surname: document.getElementById('f-surname').value,
-                email: document.getElementById('f-email').value, company: document.getElementById('f-company').value,
+                name: document.getElementById('f-name').value, 
+                surname: document.getElementById('f-surname').value,
+                email: document.getElementById('f-email').value, 
+                company: document.getElementById('f-company').value,
                 position: document.getElementById('f-position').value
             };
             renderInstruction();
@@ -146,13 +148,14 @@
                 <div style="text-align:left; color:#1e293b; line-height:1.5; font-size:14px;">
                     <h3 style="color:var(--primary); margin-top:0;">Добро пожаловать</h3>
                     <p>Профильный Анализ Личности создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
-                    <p><b>Это не тест.</b> Здесь нет правильных или неправильных ответов. Результаты подчеркивают Ваши сильные стороны и помогают соответствовать требованиям рабочей среды.</p>
-                    <p>Отвечайте спонтанно. Первый пришедший в голову ответ — самый точный. При заполнении думайте о себе на <b>текущей работе</b>.</p>
+                    <p><b>Это не тест.</b> Здесь нет "правильных" или "неправильных" ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах в работе и помогают лучше соответствовать требованиям рабочей среды.</p>
+                    <p>Первый ответ, который приходит Вам в голову, как правило, является самым точным. Постарайтесь отвечать спонтанно и честно.</p>
+                    <p>При заполнении анкеты думайте о себе на <b>текущей работе</b>.</p>
                     
                     <h3 style="color:var(--primary); margin-top:20px;">Инструкция</h3>
                     <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
                         <ol style="padding-left:20px; margin:0;">
-                            <li style="margin-bottom:8px;">Выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
+                            <li style="margin-bottom:8px;">В каждой группе выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
                             <li style="margin-bottom:8px;">Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
                             <li>Нажмите кнопку «Далее» для перехода к следующей группе.</li>
                         </ol>
@@ -196,17 +199,17 @@
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
-                            <span style="font-weight:500;">${opt.t}</span>
-                            <div style="display:flex; gap:8px;">
+                            <span style="font-weight:600; color:#334155;">${opt.t}</span>
+                            <div style="display:flex; gap:10px;">
                                 <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
                                 <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
                             </div>
                         </div>
                     `).join('')}
                 </div>
-                <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:12px; color:#94a3b8;">Группа ${currentIdx+1} из 24</span>
-                    <button id="next-btn" class="btn-main" style="width:auto; padding:10px 20px; margin:0;" disabled onclick="window.goNext()">Далее</button>
+                <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:#64748b;">Группа ${currentIdx+1} из 24</span>
+                    <button id="next-btn" class="btn-main" style="width:auto; padding:12px 30px; margin:0;" disabled onclick="window.goNext()">Далее</button>
                 </div>
             </div>
         `;
@@ -221,7 +224,7 @@
             await updateDoc(doc(db, "tokens", userToken), { 
                 results: scores, userDetails: userData, used: true, finishedAt: new Date().toISOString() 
             });
-            appDiv.innerHTML = `<div class="card">${headerHTML}<div style="color:var(--secondary); font-size: 50px; margin: 20px 0;">✓</div><h2>Готово!</h2><p>Данные успешно переданы. Спасибо за участие!</p></div>`;
+            appDiv.innerHTML = `<div class="card">${headerHTML}<div style="color:var(--secondary); font-size: 60px; margin: 20px 0;">✓</div><h2>Готово!</h2><p>Данные переданы. Спасибо за участие!</p></div>`;
         } catch (e) { showError("Ошибка сохранения."); }
     }
 
