@@ -15,27 +15,33 @@
         :root { --primary: #244381; --secondary: #8DC53F; --bg: #f4f7f6; --text: #1e293b; --border: #e2e8f0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
         .container { width: 100%; max-width: 600px; }
-        .card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
+        .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
+        
+        /* Header styles */
         .brand-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
         .brand-logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto 10px; }
         .brand-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
 
+        /* Step control */
         .step-content { display: none; }
         .step-content.active { display: block; }
 
-        .form-group { margin-bottom: 12px; text-align: left; }
-        label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 13px; color: #64748b; }
-        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
+        /* Form styles */
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
+        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
         
-        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 15px; }
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
         .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        .instr-text { text-align: left; font-size: 14px; line-height: 1.5; color: #1e293b; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border); }
-        .instr-text h3 { color: var(--secondary); font-size: 17px; margin-bottom: 8px; }
-        .instr-text h4 { color: var(--primary); font-size: 16px; margin: 12px 0 8px 0; }
+        /* Instruction text from your original code */
+        .instr-text { text-align: left; font-size: 14px; line-height: 1.6; color: #1e293b; }
+        .instr-text h3 { color: var(--secondary); font-size: 18px; margin-bottom: 10px; }
+        .instr-text h4 { color: var(--primary); font-size: 18px; margin: 15px 0 10px 0; }
         .instr-list { padding-left: 20px; margin: 0; }
-        .instr-list li { margin-bottom: 5px; }
+        .instr-list li { margin-bottom: 8px; }
 
+        /* Quiz styles */
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         .word-grid { display: grid; gap: 8px; }
@@ -43,7 +49,7 @@
         .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
-        
+
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -53,30 +59,37 @@
 <div id="app" class="container">
     <div class="card">
         <header class="brand-header">
-            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" class="brand-logo-img" alt="SYSEVOLVE">
+            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" class="brand-logo-img" onerror="this.src='https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media';">
             <div class="brand-title">Профиль Личности DISC</div>
         </header>
 
-        <div id="step-start" class="step-content active">
+        <div id="step-reg" class="step-content active">
             <h2>Регистрация</h2>
             <div class="form-group"><label>Имя *</label><input type="text" id="f-name" required></div>
             <div class="form-group"><label>Фамилия *</label><input type="text" id="f-surname" required></div>
             <div class="form-group"><label>Электронная почта *</label><input type="email" id="f-email" required></div>
             <div class="form-group"><label>Название организации</label><input type="text" id="f-company"></div>
             <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
+            <button type="button" class="btn-main" onclick="goToInstructions()">Продолжить</button>
+        </div>
 
+        <div id="step-instr" class="step-content">
             <div class="instr-text">
-                <h3>Инструкция</h3>
-                <p>Профиль DISC определяет ваш стиль поведения в рабочей среде. <b>Это не тест</b>, здесь нет правильных ответов.</p>
-                <div style="background:#f8fafc; padding:12px; border-radius:10px; border:1px solid var(--border);">
+                <h3>Профиль Личности DISC</h3>
+                <h4>Добро пожаловать</h4>
+                <p>Профиль Личности DISC создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
+                <p><b>Это не тест.</b> Здесь нет "правильных" или "неправильных" ответов.</p>
+                <p>Первый ответ, который приходит в голову, как правило, является самым точным.</p>
+                
+                <h4>Инструкция</h4>
+                <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
                     <ol class="instr-list">
-                        <li>Выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
-                        <li>Выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
+                        <li>В каждой группе выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
+                        <li>Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
                     </ol>
                 </div>
             </div>
-            
-            <button type="button" class="btn-main" onclick="startQuiz()">Начать заполнение</button>
+            <button type="button" class="btn-main" style="margin-top:20px;" onclick="startQuiz()">Начать заполнение</button>
         </div>
 
         <div id="step-quiz" class="step-content">
@@ -91,7 +104,7 @@
         <div id="step-final" class="step-content">
             <div id="final-status">
                 <div class="loader"></div>
-                <p>Сохранение...</p>
+                <p>Сохранение результатов...</p>
             </div>
         </div>
     </div>
@@ -126,4 +139,138 @@
         { options: [{t:"Агрессивный",v:"D"}, {t:"Душа компании",v:"I"}, {t:"Дружелюбный",v:"S"}, {t:"Боязливый",v:"C"}] },
         { options: [{t:"Осторожный",v:"C"}, {t:"Решительный",v:"D"}, {t:"Обаятельный",v:"I"}, {t:"Покладистый",v:"S"}] },
         { options: [{t:"Уверенный",v:"I"}, {t:"Дисциплинированный",v:"C"}, {t:"Щедрый",v:"S"}, {t:"Напористый",v:"D"}] },
-        { options: [{t:"Требовательный",v:"D"}, {t:"Эмоциональный",v:"I"}, {
+        { options: [{t:"Требовательный",v:"D"}, {t:"Эмоциональный",v:"I"}, {t:"Преданный",v:"S"}, {t:"Исполнительный",v:"C"}] },
+        { options: [{t:"Приятный",v:"I"}, {t:"Точный",v:"C"}, {t:"Прямолинейный",v:"D"}, {t:"Уравновешенный",v:"S"}] },
+        { options: [{t:"Нетерпеливый",v:"D"}, {t:"Радивый",v:"C"}, {t:"Убеждающий",v:"I"}, {t:"Мирный",v:"S"}] },
+        { options: [{t:"Логичный",v:"C"}, {t:"Смелый",v:"D"}, {t:"Верный",v:"S"}, {t:"Популярный",v:"I"}] },
+        { options: [{t:"Выдержанный",v:"S"}, {t:"Готовый к риску",v:"D"}, {t:"Красноречивый",v:"I"}, {t:"Тактичный",v:"C"}] },
+        { options: [{t:"Властный",v:"D"}, {t:"Влиятельный",v:"I"}, {t:"Покладистый",v:"S"}, {t:"Скромный",v:"C"}] },
+        { options: [{t:"Уважительный",v:"C"}, {t:"Новаторский",v:"D"}, {t:"Оптимистичный",v:"I"}, {t:"Услужливый",v:"S"}] },
+        { options: [{t:"Дипломатичный",v:"C"}, {t:"Удовлетворенный",v:"S"}, {t:"Энергичный",v:"D"}, {t:"Вдохновляющий",v:"I"}] },
+        { options: [{t:"Дисциплинированный",v:"C"}, {t:"Смелый",v:"D"}, {t:"Верный",v:"S"}, {t:"Популярный",v:"I"}] },
+        { options: [{t:"Мягкий",v:"S"}, {t:"Убедительный",v:"I"}, {t:"Скромный",v:"C"}, {t:"Решительный",v:"D"}] },
+        { options: [{t:"Застенчивый",v:"C"}, {t:"Инициативный",v:"D"}, {t:"Стабильный",v:"S"}, {t:"Жизнерадостный",v:"I"}] },
+        { options: [{t:"Прямой",v:"D"}, {t:"Душевный",v:"S"}, {t:"Интересный",v:"I"}, {t:"Тщательный",v:"C"}] }
+    ];
+
+    let currentIdx = 0;
+    let userToken = "";
+    let userData = {};
+    let choices = [];
+
+    window.goToInstructions = function() {
+        const name = document.getElementById('f-name').value;
+        const sname = document.getElementById('f-surname').value;
+        const email = document.getElementById('f-email').value;
+        if(!name || !sname || !email) return alert("Заполните обязательные поля!");
+        
+        userData = {
+            name, surname: sname, email,
+            company: document.getElementById('f-company').value,
+            position: document.getElementById('f-position').value
+        };
+        
+        document.getElementById('step-reg').classList.remove('active');
+        document.getElementById('step-instr').classList.add('active');
+    };
+
+    window.startQuiz = function() {
+        document.getElementById('step-instr').classList.remove('active');
+        document.getElementById('step-quiz').classList.add('active');
+        renderQuestion();
+    };
+
+    window.selectChoice = function(qIdx, type) {
+        if(!choices[currentIdx]) choices[currentIdx] = {};
+        const selected = questions[currentIdx].options[qIdx];
+        choices[currentIdx][type] = { factor: selected.v, text: selected.t };
+        
+        const prefix = type === 'plus' ? 'p-' : 'm-';
+        for(let i=0; i<4; i++) document.getElementById(prefix+i).classList.remove('active');
+        document.getElementById(prefix+qIdx).classList.add('active');
+        
+        const c = choices[currentIdx];
+        document.getElementById('next-btn').disabled = !(c.plus && c.minus && c.plus.text !== c.minus.text);
+    };
+
+    window.goNext = function() {
+        currentIdx++;
+        if(currentIdx < questions.length) renderQuestion();
+        else finalize();
+    };
+
+    function renderQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('p-bar').style.width = (currentIdx / questions.length * 100) + '%';
+        document.getElementById('q-counter').innerText = `Группа ${currentIdx+1} из 24`;
+        document.getElementById('next-btn').disabled = true;
+
+        document.getElementById('quiz-container').innerHTML = `
+            <div class="word-grid">
+                ${q.options.map((opt, i) => `
+                    <div class="word-item">
+                        <span style="font-weight:600; color:#334155;">${opt.t}</span>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-choice plus" id="p-${i}" onclick="selectChoice(${i}, 'plus')">+</button>
+                            <button class="btn-choice minus" id="m-${i}" onclick="selectChoice(${i}, 'minus')">-</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    async function finalize() {
+        document.getElementById('step-quiz').classList.remove('active');
+        document.getElementById('step-final').classList.add('active');
+
+        const graph1 = {D:0,I:0,S:0,C:0}, graph2 = {D:0,I:0,S:0,C:0}, adjectiveTable = [];
+        choices.forEach(c => {
+            if(c.plus) graph1[c.plus.factor]++;
+            if(c.minus) graph2[c.minus.factor]++;
+            adjectiveTable.push({ most: c.plus ? c.plus.text : "", least: c.minus ? c.minus.text : "" });
+        });
+        const graph3 = {D: graph1.D-graph2.D, I: graph1.I-graph2.I, S: graph1.S-graph2.S, C: graph1.C-graph2.C};
+
+        try {
+            await updateDoc(doc(db, "tokens", userToken), { 
+                results: { graph1, graph2, graph3 }, 
+                selectedAdjectives: adjectiveTable,
+                userDetails: userData, 
+                used: true, 
+                finishedAt: new Date().toISOString()
+            });
+
+            await emailjs.send("service_4wwl3xh", "template_7muk9at", {
+                user_name: `${userData.name} ${userData.surname}`,
+                user_email: userData.email,
+                company: userData.company || "-",
+                position: userData.position || "-",
+                results_summary: `D:${graph3.D}, I:${graph3.I}, S:${graph3.S}, C:${graph3.C}`,
+                word_list: adjectiveTable.map((p, i) => `${i+1}. +${p.most} / -${p.least}`).join("\n")
+            });
+
+            document.getElementById('final-status').innerHTML = `
+                <div style="color:var(--secondary); font-size: 50px; margin: 15px 0;">✓</div>
+                <h2>Завершено!</h2>
+                <p>Ваши ответы успешно сохранены и отправлены. Благодарим за участие!</p>
+            `;
+        } catch (e) {
+            document.getElementById('final-status').innerHTML = `<h2>Ошибка</h2><p>Не удалось сохранить данные.</p>`;
+        }
+    }
+
+    // Загрузка токена и предзаполнение имени
+    const params = new URLSearchParams(window.location.search);
+    userToken = params.get('token');
+    if(!userToken) {
+        document.getElementById('step-reg').innerHTML = "<h2>Ошибка</h2><p>Токен не найден в ссылке.</p>";
+    } else {
+        const snap = await getDoc(doc(db, "tokens", userToken));
+        if(snap.exists() && snap.data().name) {
+            document.getElementById('f-name').value = snap.data().name;
+        }
+    }
+</script>
+</body>
+</html>
