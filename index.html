@@ -16,16 +16,32 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
-        .brand-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
-        .brand-logo-img { max-height: 55px; width: auto; display: block; margin: 0 auto 12px; }
-        .brand-title { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-        h2 { font-size: 20px; color: var(--primary); margin-bottom: 20px; }
+        
+        /* Header styles */
+        .brand-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
+        .brand-logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto 10px; }
+        .brand-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Step control */
+        .step-content { display: none; }
+        .step-content.active { display: block; }
+
+        /* Form styles */
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
         input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        
         .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
         .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
-        .instr-text { text-align: left; font-size: 15px; line-height: 1.7; color: #475569; margin-bottom: 25px; background: #f8fafc; padding: 20px; border-radius: 15px; border: 1px solid var(--border); }
+
+        /* Instruction text from your original code */
+        .instr-text { text-align: left; font-size: 14px; line-height: 1.6; color: #1e293b; }
+        .instr-text h3 { color: var(--secondary); font-size: 18px; margin-bottom: 10px; }
+        .instr-text h4 { color: var(--primary); font-size: 18px; margin: 15px 0 10px 0; }
+        .instr-list { padding-left: 20px; margin: 0; }
+        .instr-list li { margin-bottom: 8px; }
+
+        /* Quiz styles */
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         .word-grid { display: grid; gap: 8px; }
@@ -33,6 +49,7 @@
         .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
+
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -40,7 +57,57 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+    <div class="card">
+        <header class="brand-header">
+            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" class="brand-logo-img" onerror="this.src='https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media';">
+            <div class="brand-title">Профиль Личности DISC</div>
+        </header>
+
+        <div id="step-reg" class="step-content active">
+            <h2>Регистрация</h2>
+            <div class="form-group"><label>Имя *</label><input type="text" id="f-name" required></div>
+            <div class="form-group"><label>Фамилия *</label><input type="text" id="f-surname" required></div>
+            <div class="form-group"><label>Электронная почта *</label><input type="email" id="f-email" required></div>
+            <div class="form-group"><label>Название организации</label><input type="text" id="f-company"></div>
+            <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
+            <button type="button" class="btn-main" onclick="goToInstructions()">Продолжить</button>
+        </div>
+
+        <div id="step-instr" class="step-content">
+            <div class="instr-text">
+                <h3>Профиль Личности DISC</h3>
+                <h4>Добро пожаловать</h4>
+                <p>Профиль Личности DISC создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
+                <p><b>Это не тест.</b> Здесь нет "правильных" или "неправильных" ответов.</p>
+                <p>Первый ответ, который приходит в голову, как правило, является самым точным.</p>
+                
+                <h4>Инструкция</h4>
+                <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
+                    <ol class="instr-list">
+                        <li>В каждой группе выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
+                        <li>Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
+                    </ol>
+                </div>
+            </div>
+            <button type="button" class="btn-main" style="margin-top:20px;" onclick="startQuiz()">Начать заполнение</button>
+        </div>
+
+        <div id="step-quiz" class="step-content">
+            <div class="progress-w"><div id="p-bar" class="progress-b" style="width: 0%"></div></div>
+            <div id="quiz-container"></div>
+            <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
+                <span id="q-counter" style="font-size:13px; color:#64748b;"></span>
+                <button id="next-btn" class="btn-main" style="width:auto; padding:12px 30px; margin:0;" disabled onclick="goNext()">Далее</button>
+            </div>
+        </div>
+
+        <div id="step-final" class="step-content">
+            <div id="final-status">
+                <div class="loader"></div>
+                <p>Сохранение результатов...</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="module">
@@ -90,140 +157,87 @@
     let userToken = "";
     let userData = {};
     let choices = [];
-    const appDiv = document.getElementById('app');
 
-    const headerHTML = `
-        <header class="brand-header">
-            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" class="brand-logo-img" onerror="this.src='https://via.placeholder.com/200x50?text=SYSEVOLVE';">
-            <div class="brand-title">Профиль Личности DISC</div>
-        </header>
-    `;
-
-    async function init() {
-        const params = new URLSearchParams(window.location.search);
-        userToken = params.get('token');
-        if (!userToken) return showError("Токен отсутствует.");
-        try {
-            const snap = await getDoc(doc(db, "tokens", userToken));
-            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
-            renderForm(snap.data().name);
-        } catch (e) { showError("Ошибка сети."); }
-    }
-
-    // ЭКРАН 1: ФОРМА
-    function renderForm(dbName) {
-        appDiv.innerHTML = `
-            <div class="card">
-                ${headerHTML}
-                <h2>Регистрация</h2>
-                <form id="reg-form">
-                    <div class="form-group"><label>Имя *</label><input type="text" id="f-name" value="${dbName || ''}" required></div>
-                    <div class="form-group"><label>Фамилия *</label><input type="text" id="f-surname" required></div>
-                    <div class="form-group"><label>Электронная почта *</label><input type="email" id="f-email" required></div>
-                    <div class="form-group"><label>Организация</label><input type="text" id="f-company"></div>
-                    <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
-                    <button type="button" id="to-instr" class="btn-main">Далее</button>
-                </form>
-            </div>
-        `;
-        document.getElementById('to-instr').onclick = () => {
-            const name = document.getElementById('f-name').value;
-            const surname = document.getElementById('f-surname').value;
-            const email = document.getElementById('f-email').value;
-            if(!name || !surname || !email) return alert("Пожалуйста, заполните обязательные поля");
-            
-            userData = {
-                name, surname, email,
-                company: document.getElementById('f-company').value,
-                position: document.getElementById('f-position').value
-            };
-            renderInstructions();
-        };
-    }
-
-    // ЭКРАН 2: ИНСТРУКЦИЯ
-    function renderInstructions() {
-        appDiv.innerHTML = `
-            <div class="card">
-                ${headerHTML}
-                <h2>Инструкция</h2>
-                <div class="instr-text">
-                    Этот опросник содержит 24 группы утверждений. В каждой группе:<br><br>
-                    1. Выберите одно слово, которое <b>наиболее</b> точно описывает Вас <b>(+)</b>.<br>
-                    2. Выберите одно слово, которое <b>наименее</b> точно описывает Вас <b>(-)</b>.<br><br>
-                    Пожалуйста, отвечайте быстро, основываясь на первом впечатлении.
-                </div>
-                <button type="button" id="start-test" class="btn-main">Приступить к тесту</button>
-            </div>
-        `;
-        document.getElementById('start-test').onclick = () => { renderQuiz(); };
-    }
-
-    // ЭКРАН 3: ТЕСТ
-    function renderQuiz() {
-        const q = questions[currentIdx];
-        const progress = (currentIdx / questions.length) * 100;
-        appDiv.innerHTML = `
-            <div class="card">
-                ${headerHTML}
-                <div class="progress-w"><div class="progress-b" style="width: ${progress}%"></div></div>
-                <div class="word-grid">
-                    ${q.options.map((opt, i) => `
-                        <div class="word-item">
-                            <span style="font-weight:600;">${opt.t}</span>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn-choice plus" id="p-${i}">+</button>
-                                <button class="btn-choice minus" id="m-${i}">-</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <button id="next-btn" class="btn-main" disabled style="margin-top:20px;">Следующий этап</button>
-                <div style="margin-top:10px; font-size:12px; color:#94a3b8;">Вопрос ${currentIdx+1} из 24</div>
-            </div>
-        `;
-
-        // Логика выбора внутри вопроса
-        q.options.forEach((opt, i) => {
-            document.getElementById(`p-${i}`).onclick = () => selectChoice(i, 'plus');
-            document.getElementById(`m-${i}`).onclick = () => selectChoice(i, 'minus');
-        });
-        document.getElementById('next-btn').onclick = goNext;
-    }
-
-    function selectChoice(idx, type) {
-        if(!choices[currentIdx]) choices[currentIdx] = {};
-        choices[currentIdx][type] = questions[currentIdx].options[idx];
+    window.goToInstructions = function() {
+        const name = document.getElementById('f-name').value;
+        const sname = document.getElementById('f-surname').value;
+        const email = document.getElementById('f-email').value;
+        if(!name || !sname || !email) return alert("Заполните обязательные поля!");
         
-        const group = type === 'plus' ? 'p-' : 'm-';
-        for(let i=0; i<4; i++) { document.getElementById(group+i).classList.remove('active'); }
-        document.getElementById(group+idx).classList.add('active');
+        userData = {
+            name, surname: sname, email,
+            company: document.getElementById('f-company').value,
+            position: document.getElementById('f-position').value
+        };
+        
+        document.getElementById('step-reg').classList.remove('active');
+        document.getElementById('step-instr').classList.add('active');
+    };
+
+    window.startQuiz = function() {
+        document.getElementById('step-instr').classList.remove('active');
+        document.getElementById('step-quiz').classList.add('active');
+        renderQuestion();
+    };
+
+    window.selectChoice = function(qIdx, type) {
+        if(!choices[currentIdx]) choices[currentIdx] = {};
+        const selected = questions[currentIdx].options[qIdx];
+        choices[currentIdx][type] = { factor: selected.v, text: selected.t };
+        
+        const prefix = type === 'plus' ? 'p-' : 'm-';
+        for(let i=0; i<4; i++) document.getElementById(prefix+i).classList.remove('active');
+        document.getElementById(prefix+qIdx).classList.add('active');
         
         const c = choices[currentIdx];
-        document.getElementById('next-btn').disabled = !(c.plus && c.minus && c.plus.t !== c.minus.t);
-    }
+        document.getElementById('next-btn').disabled = !(c.plus && c.minus && c.plus.text !== c.minus.text);
+    };
 
-    function goNext() {
+    window.goNext = function() {
         currentIdx++;
-        if (currentIdx < questions.length) renderQuiz();
-        else finish();
+        if(currentIdx < questions.length) renderQuestion();
+        else finalize();
+    };
+
+    function renderQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('p-bar').style.width = (currentIdx / questions.length * 100) + '%';
+        document.getElementById('q-counter').innerText = `Группа ${currentIdx+1} из 24`;
+        document.getElementById('next-btn').disabled = true;
+
+        document.getElementById('quiz-container').innerHTML = `
+            <div class="word-grid">
+                ${q.options.map((opt, i) => `
+                    <div class="word-item">
+                        <span style="font-weight:600; color:#334155;">${opt.t}</span>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-choice plus" id="p-${i}" onclick="selectChoice(${i}, 'plus')">+</button>
+                            <button class="btn-choice minus" id="m-${i}" onclick="selectChoice(${i}, 'minus')">-</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
     }
 
-    async function finish() {
-        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Обработка и отправка результатов...</p></div>';
-        const g1 = {D:0,I:0,S:0,C:0}, g2 = {D:0,I:0,S:0,C:0}, wl = [];
-        choices.forEach((c, i) => {
-            if(c.plus) g1[c.plus.v]++;
-            if(c.minus) g2[c.minus.v]++;
-            wl.push(`${i+1}. +${c.plus.t} / -${c.minus.t}`);
+    async function finalize() {
+        document.getElementById('step-quiz').classList.remove('active');
+        document.getElementById('step-final').classList.add('active');
+
+        const graph1 = {D:0,I:0,S:0,C:0}, graph2 = {D:0,I:0,S:0,C:0}, adjectiveTable = [];
+        choices.forEach(c => {
+            if(c.plus) graph1[c.plus.factor]++;
+            if(c.minus) graph2[c.minus.factor]++;
+            adjectiveTable.push({ most: c.plus ? c.plus.text : "", least: c.minus ? c.minus.text : "" });
         });
-        const g3 = {D: g1.D-g2.D, I: g1.I-g2.I, S: g1.S-g2.S, C: g1.C-g2.C};
+        const graph3 = {D: graph1.D-graph2.D, I: graph1.I-graph2.I, S: graph1.S-graph2.S, C: graph1.C-graph2.C};
 
         try {
             await updateDoc(doc(db, "tokens", userToken), { 
-                results: { g1, g2, g3 }, 
+                results: { graph1, graph2, graph3 }, 
+                selectedAdjectives: adjectiveTable,
                 userDetails: userData, 
-                used: true,
+                used: true, 
                 finishedAt: new Date().toISOString()
             });
 
@@ -232,16 +246,31 @@
                 user_email: userData.email,
                 company: userData.company || "-",
                 position: userData.position || "-",
-                results_summary: `D:${g3.D}, I:${g3.I}, S:${g3.S}, C:${g3.C}`,
-                word_list: wl.join("\n")
+                results_summary: `D:${graph3.D}, I:${graph3.I}, S:${graph3.S}, C:${graph3.C}`,
+                word_list: adjectiveTable.map((p, i) => `${i+1}. +${p.most} / -${p.least}`).join("\n")
             });
 
-            appDiv.innerHTML = `<div class="card">${headerHTML}<div style="color:var(--secondary); font-size: 50px;">✓</div><h2>Тест завершен!</h2><p>Ваши ответы успешно отправлены. Спасибо!</p></div>`;
-        } catch (e) { showError("Ошибка при сохранении данных."); }
+            document.getElementById('final-status').innerHTML = `
+                <div style="color:var(--secondary); font-size: 50px; margin: 15px 0;">✓</div>
+                <h2>Завершено!</h2>
+                <p>Ваши ответы успешно сохранены и отправлены. Благодарим за участие!</p>
+            `;
+        } catch (e) {
+            document.getElementById('final-status').innerHTML = `<h2>Ошибка</h2><p>Не удалось сохранить данные.</p>`;
+        }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
-    init();
+    // Загрузка токена и предзаполнение имени
+    const params = new URLSearchParams(window.location.search);
+    userToken = params.get('token');
+    if(!userToken) {
+        document.getElementById('step-reg').innerHTML = "<h2>Ошибка</h2><p>Токен не найден в ссылке.</p>";
+    } else {
+        const snap = await getDoc(doc(db, "tokens", userToken));
+        if(snap.exists() && snap.data().name) {
+            document.getElementById('f-name').value = snap.data().name;
+        }
+    }
 </script>
 </body>
 </html>
