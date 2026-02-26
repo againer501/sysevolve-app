@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SYSEVOLVE | DISC</title>
+    <title>SYSEVOLVE | DISC Assessment</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function(){
+            // Ваш Public Key
+            emailjs.init("OhvDHzB8R3Zxdh9Q7");
+        })();
+    </script>
+
     <style>
         :root { --primary: #244381; --secondary: #8DC53F; --bg: #f4f7f6; --text: #1e293b; --border: #e2e8f0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
@@ -87,7 +96,7 @@
 
     const headerHTML = `
         <header class="brand-header">
-            <img src="logo.jpg" alt="SYSEVOLVE" class="brand-logo-img" onerror="this.src='https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media';">
+            <img src="https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media" class="brand-logo-img">
             <div class="brand-title">Профиль Личности DISC</div>
         </header>
     `;
@@ -112,9 +121,8 @@
                     <div class="form-group"><label>Имя *</label><input type="text" id="f-name" value="${dbName || ''}" required></div>
                     <div class="form-group"><label>Фамилия *</label><input type="text" id="f-surname" required></div>
                     <div class="form-group"><label>Электронная почта *</label><input type="email" id="f-email" required></div>
-                    <div class="form-group"><label>Название организации</label><input type="text" id="f-company"></div>
-                    <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
-                    <button type="submit" class="btn-main">Продолжить</button>
+                    <div class="form-group"><label>Организация</label><input type="text" id="f-company"></div>
+                    <button type="submit" class="btn-main">Начать тест</button>
                 </form>
             </div>
         `;
@@ -124,8 +132,7 @@
                 name: document.getElementById('f-name').value, 
                 surname: document.getElementById('f-surname').value,
                 email: document.getElementById('f-email').value, 
-                company: document.getElementById('f-company').value,
-                position: document.getElementById('f-position').value
+                company: document.getElementById('f-company').value
             };
             renderQuiz();
         };
@@ -133,18 +140,11 @@
 
     window.select = (idx, type) => {
         if(!choices[currentIdx]) choices[currentIdx] = {};
-        const opt = questions[currentIdx].options[idx];
-        choices[currentIdx][type] = { v: opt.v, t: opt.t };
+        choices[currentIdx][type] = questions[currentIdx].options[idx];
         const group = type === 'plus' ? 'p-' : 'm-';
-        for(let i=0; i<4; i++) {
-            const el = document.getElementById(group+i);
-            if(el) el.classList.remove('active');
-        }
+        for(let i=0; i<4; i++) { document.getElementById(group+i)?.classList.remove('active'); }
         document.getElementById(group+idx).classList.add('active');
-        const btn = document.getElementById('next-btn');
-        if(choices[currentIdx].plus && choices[currentIdx].minus) {
-            btn.disabled = (choices[currentIdx].plus.t === choices[currentIdx].minus.t);
-        }
+        document.getElementById('next-btn').disabled = !(choices[currentIdx].plus && choices[currentIdx].minus && choices[currentIdx].plus.t !== choices[currentIdx].minus.t);
     };
 
     window.goNext = () => {
@@ -163,7 +163,7 @@
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
-                            <span style="font-weight:600;">${opt.t}</span>
+                            <span>${opt.t}</span>
                             <div style="display:flex; gap:10px;">
                                 <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
                                 <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
@@ -171,66 +171,56 @@
                         </div>
                     `).join('')}
                 </div>
-                <div style="margin-top:25px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; color:#64748b;">Группа ${currentIdx+1} из 24</span>
-                    <button id="next-btn" class="btn-main" style="width:auto; padding:12px 30px; margin:0;" disabled onclick="window.goNext()">Далее</button>
-                </div>
+                <button id="next-btn" class="btn-main" disabled onclick="window.goNext()" style="margin-top:20px;">Далее</button>
             </div>
         `;
     }
 
     async function finish() {
-        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение данных...</p></div>';
+        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение и отправка отчета...</p></div>';
         
         const graph1 = { D: 0, I: 0, S: 0, C: 0 };
         const graph2 = { D: 0, I: 0, S: 0, C: 0 };
-        const graph3 = { D: 0, I: 0, S: 0, C: 0 };
-        const selectedAdjectives = [];
+        const wordTable = [];
 
         choices.forEach((c, i) => {
             if(c.plus) graph1[c.plus.v]++;
             if(c.minus) graph2[c.minus.v]++;
-            selectedAdjectives.push({
-                most: c.plus ? c.plus.t : "",
-                least: c.minus ? c.minus.t : ""
-            });
+            wordTable.push(`${i+1}. +${c.plus.t} / -${c.minus.t}`);
         });
-        for(let k in graph3) { graph3[k] = graph1[k] - graph2[k]; }
+
+        const graph3 = { D: graph1.D - graph2.D, I: graph1.I - graph2.I, S: graph1.S - graph2.S, C: graph1.C - graph2.C };
 
         try {
-            // Сохраняем все в Firebase
+            // 1. Сохранение в Firebase
             await updateDoc(doc(db, "tokens", userToken), { 
                 results: { graph1, graph2, graph3 },
-                selectedAdjectives,
+                selectedAdjectives: wordTable,
                 userDetails: userData, 
                 used: true, 
                 finishedAt: new Date().toISOString() 
             });
 
-            // Формируем текст для письма (mailto)
-            const myEmail = "ВАШ_EMAIL_ЗДЕСЬ@yandex.ru"; // <--- ЗАМЕНИТЕ НА ВАШУ ПОЧТУ
-            const subject = encodeURIComponent(`Результат DISC: ${userData.name} ${userData.surname}`);
-            const body = encodeURIComponent(
-                `Кандидат: ${userData.name} ${userData.surname}\n` +
-                `Email: ${userData.email}\n` +
-                `Организация: ${userData.company || '-'}\n\n` +
-                `ИТОГОВЫЕ БАЛЛЫ:\n` +
-                `D: ${graph3.D}, I: ${graph3.I}, S: ${graph3.S}, C: ${graph3.C}\n\n` +
-                `ВЫБРАННЫЕ СЛОВА:\n` +
-                selectedAdjectives.map((a, i) => `${i+1}. +${a.most} / -${a.least}`).join('\n')
-            );
+            // 2. Автоматическая отправка через EmailJS
+            await emailjs.send("service_4wwl3xh", "template_7muk9at", {
+                user_name: `${userData.name} ${userData.surname}`,
+                user_email: userData.email,
+                company: userData.company || "Не указана",
+                results_summary: `D:${graph3.D}, I:${graph3.I}, S:${graph3.S}, C:${graph3.C}`,
+                word_list: wordTable.join("\n")
+            });
 
             appDiv.innerHTML = `
                 <div class="card">
                     ${headerHTML}
-                    <div style="color:var(--secondary); font-size: 50px; margin: 15px 0;">✓</div>
-                    <h2>Тест завершен!</h2>
-                    <p>Данные сохранены в базе. Нажмите кнопку ниже, чтобы отправить отчет администратору:</p>
-                    <a href="mailto:${myEmail}?subject=${subject}&body=${body}" class="btn-main">
-                        ОТПРАВИТЬ ОТЧЕТ ПО EMAIL
-                    </a>
+                    <div style="color:var(--secondary); font-size: 60px;">✓</div>
+                    <h2>Готово!</h2>
+                    <p>Ваши результаты сохранены и отправлены администратору. Спасибо!</p>
                 </div>`;
-        } catch (e) { showError("Ошибка сохранения."); }
+        } catch (e) {
+            console.error(e);
+            showError("Ошибка при сохранении данных.");
+        }
     }
 
     function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
