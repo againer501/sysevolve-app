@@ -8,9 +8,7 @@
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
-        (function(){
-            emailjs.init("OhvDHzB8R3Zxdh9Q7");
-        })();
+        (function(){ emailjs.init("OhvDHzB8R3Zxdh9Q7"); })();
     </script>
 
     <style>
@@ -18,22 +16,21 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
-        .brand-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; position: relative; }
+        .brand-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
         .brand-logo-img { max-height: 55px; width: auto; display: block; margin: 0 auto 12px; }
-        .alt-logo-text { font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 10px; display: block; }
         .brand-title { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
         h2 { font-size: 20px; color: var(--primary); margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
-        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; transition: border-color 0.2s; }
-        input:focus { border-color: var(--primary); }
+        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
         .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
         .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .instr-text { text-align: left; font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 25px; }
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         .word-grid { display: grid; gap: 8px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
-        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -43,7 +40,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+    <div class="card"><div class="loader"></div><p>Загрузка...</p></div>
 </div>
 
 <script type="module">
@@ -95,14 +92,9 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
-    // Хедер: используем прямую ссылку на logo.jpg из вашего репозитория
     const headerHTML = `
         <header class="brand-header">
-            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" 
-                 alt="SYSEVOLVE" 
-                 class="brand-logo-img" 
-                 onerror="this.style.display='none'; document.getElementById('alt-logo').style.display='block';">
-            <span id="alt-logo" class="alt-logo-text" style="display:none;">GLOBAL CENTER OF SYSTEMS EVOLVING</span>
+            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" class="brand-logo-img">
             <div class="brand-title">Профиль Личности DISC</div>
         </header>
     `;
@@ -113,7 +105,7 @@
         if (!userToken) return showError("Токен отсутствует.");
         try {
             const snap = await getDoc(doc(db, "tokens", userToken));
-            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна или уже использована.");
+            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
             renderForm(snap.data().name);
         } catch (e) { showError("Ошибка сети."); }
     }
@@ -129,7 +121,7 @@
                     <div class="form-group"><label>Электронная почта *</label><input type="email" id="f-email" required></div>
                     <div class="form-group"><label>Организация</label><input type="text" id="f-company"></div>
                     <div class="form-group"><label>Должность</label><input type="text" id="f-position"></div>
-                    <button type="submit" class="btn-main">Начать тест</button>
+                    <button type="submit" class="btn-main">Далее</button>
                 </form>
             </div>
         `;
@@ -142,9 +134,25 @@
                 company: document.getElementById('f-company').value,
                 position: document.getElementById('f-position').value
             };
-            renderQuiz();
+            renderInstructions();
         };
     }
+
+    function renderInstructions() {
+        appDiv.innerHTML = `
+            <div class="card">
+                ${headerHTML}
+                <h2>Инструкция</h2>
+                <div class="instr-text">
+                    В каждой из 24 групп выберите одно слово, которое <b>наиболее</b> вам подходит (+), и одно слово, которое <b>наименее</b> вам подходит (-).<br><br>
+                    Отвечайте искренне, ориентируясь на своё поведение в рабочей среде.
+                </div>
+                <button class="btn-main" onclick="window.startQuiz()">Начать тест</button>
+            </div>
+        `;
+    }
+
+    window.startQuiz = () => { renderQuiz(); };
 
     window.select = (idx, type) => {
         if(!choices[currentIdx]) choices[currentIdx] = {};
@@ -185,49 +193,27 @@
     }
 
     async function finish() {
-        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Сохранение и отправка отчета...</p></div>';
-        
-        const graph1 = { D: 0, I: 0, S: 0, C: 0 };
-        const graph2 = { D: 0, I: 0, S: 0, C: 0 };
-        const wordTable = [];
-
+        appDiv.innerHTML = '<div class="card"><div class="loader"></div><p>Обработка данных...</p></div>';
+        const g1 = {D:0,I:0,S:0,C:0}, g2 = {D:0,I:0,S:0,C:0}, wl = [];
         choices.forEach((c, i) => {
-            if(c.plus) graph1[c.plus.v]++;
-            if(c.minus) graph2[c.minus.v]++;
-            wordTable.push(`${i+1}. +${c.plus.t} / -${c.minus.t}`);
+            if(c.plus) g1[c.plus.v]++;
+            if(c.minus) g2[c.minus.v]++;
+            wl.push(`${i+1}. +${c.plus.t} / -${c.minus.t}`);
         });
-
-        const graph3 = { D: graph1.D - graph2.D, I: graph1.I - graph2.I, S: graph1.S - graph2.S, C: graph1.C - graph2.C };
+        const g3 = {D: g1.D-g2.D, I: g1.I-g2.I, S: g1.S-g2.S, C: g1.C-g2.C};
 
         try {
-            await updateDoc(doc(db, "tokens", userToken), { 
-                results: { graph1, graph2, graph3 },
-                selectedAdjectives: wordTable,
-                userDetails: userData, 
-                used: true, 
-                finishedAt: new Date().toISOString() 
-            });
-
+            await updateDoc(doc(db, "tokens", userToken), { results: { g1, g2, g3 }, userDetails: userData, used: true });
             await emailjs.send("service_4wwl3xh", "template_7muk9at", {
                 user_name: `${userData.name} ${userData.surname}`,
                 user_email: userData.email,
-                company: userData.company || "Не указана",
-                position: userData.position || "Не указана",
-                results_summary: `D:${graph3.D}, I:${graph3.I}, S:${graph3.S}, C:${graph3.C}`,
-                word_list: wordTable.join("\n")
+                company: userData.company || "-",
+                position: userData.position || "-",
+                results_summary: `D:${g3.D}, I:${g3.I}, S:${g3.S}, C:${g3.C}`,
+                word_list: wl.join("\n")
             });
-
-            appDiv.innerHTML = `
-                <div class="card">
-                    ${headerHTML}
-                    <div style="color:var(--secondary); font-size: 60px;">✓</div>
-                    <h2>Тест завершен!</h2>
-                    <p>Результаты успешно отправлены администратору. Спасибо!</p>
-                </div>`;
-        } catch (e) {
-            console.error(e);
-            showError("Ошибка при сохранении.");
-        }
+            appDiv.innerHTML = `<div class="card">${headerHTML}<h2>Готово!</h2><p>Ваш результат сохранен и отправлен.</p></div>`;
+        } catch (e) { showError("Ошибка сохранения."); }
     }
 
     function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
