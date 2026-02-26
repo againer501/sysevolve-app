@@ -16,32 +16,21 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
-        
-        /* Header styles */
         .brand-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
         .brand-logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto 10px; }
         .brand-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Step control */
         .step-content { display: none; }
         .step-content.active { display: block; }
-
-        /* Form styles */
         .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
+        label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 13px; color: #64748b; }
         input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
-        
         .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
         .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
-
-        /* Instruction text from your original code */
         .instr-text { text-align: left; font-size: 14px; line-height: 1.6; color: #1e293b; }
-        .instr-text h3 { color: var(--secondary); font-size: 18px; margin-bottom: 10px; }
-        .instr-text h4 { color: var(--primary); font-size: 18px; margin: 15px 0 10px 0; }
+        .instr-text h3 { color: var(--secondary); font-size: 18px; margin-bottom: 10px; font-weight: 700; }
+        .instr-text h4 { color: var(--primary); font-size: 17px; margin: 15px 0 10px 0; font-weight: 600; }
         .instr-list { padding-left: 20px; margin: 0; }
         .instr-list li { margin-bottom: 8px; }
-
-        /* Quiz styles */
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         .word-grid { display: grid; gap: 8px; }
@@ -49,7 +38,6 @@
         .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
-
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -59,7 +47,7 @@
 <div id="app" class="container">
     <div class="card">
         <header class="brand-header">
-            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" class="brand-logo-img" onerror="this.src='https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media';">
+            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" class="brand-logo-img" alt="SYSEVOLVE">
             <div class="brand-title">Профиль Личности DISC</div>
         </header>
 
@@ -163,40 +151,45 @@
         const sname = document.getElementById('f-surname').value;
         const email = document.getElementById('f-email').value;
         if(!name || !sname || !email) return alert("Заполните обязательные поля!");
-        
         userData = {
             name, surname: sname, email,
             company: document.getElementById('f-company').value,
             position: document.getElementById('f-position').value
         };
-        
         document.getElementById('step-reg').classList.remove('active');
         document.getElementById('step-instr').classList.add('active');
+        window.scrollTo(0,0);
     };
 
     window.startQuiz = function() {
         document.getElementById('step-instr').classList.remove('active');
         document.getElementById('step-quiz').classList.add('active');
         renderQuestion();
+        window.scrollTo(0,0);
     };
 
     window.selectChoice = function(qIdx, type) {
         if(!choices[currentIdx]) choices[currentIdx] = {};
         const selected = questions[currentIdx].options[qIdx];
         choices[currentIdx][type] = { factor: selected.v, text: selected.t };
-        
         const prefix = type === 'plus' ? 'p-' : 'm-';
-        for(let i=0; i<4; i++) document.getElementById(prefix+i).classList.remove('active');
+        for(let i=0; i<4; i++) {
+            const el = document.getElementById(prefix+i);
+            if(el) el.classList.remove('active');
+        }
         document.getElementById(prefix+qIdx).classList.add('active');
-        
         const c = choices[currentIdx];
         document.getElementById('next-btn').disabled = !(c.plus && c.minus && c.plus.text !== c.minus.text);
     };
 
     window.goNext = function() {
         currentIdx++;
-        if(currentIdx < questions.length) renderQuestion();
-        else finalize();
+        if(currentIdx < questions.length) {
+            renderQuestion();
+            window.scrollTo(0,0);
+        } else {
+            finalize();
+        }
     };
 
     function renderQuestion() {
@@ -204,7 +197,6 @@
         document.getElementById('p-bar').style.width = (currentIdx / questions.length * 100) + '%';
         document.getElementById('q-counter').innerText = `Группа ${currentIdx+1} из 24`;
         document.getElementById('next-btn').disabled = true;
-
         document.getElementById('quiz-container').innerHTML = `
             <div class="word-grid">
                 ${q.options.map((opt, i) => `
@@ -223,7 +215,6 @@
     async function finalize() {
         document.getElementById('step-quiz').classList.remove('active');
         document.getElementById('step-final').classList.add('active');
-
         const graph1 = {D:0,I:0,S:0,C:0}, graph2 = {D:0,I:0,S:0,C:0}, adjectiveTable = [];
         choices.forEach(c => {
             if(c.plus) graph1[c.plus.factor]++;
@@ -236,11 +227,8 @@
             await updateDoc(doc(db, "tokens", userToken), { 
                 results: { graph1, graph2, graph3 }, 
                 selectedAdjectives: adjectiveTable,
-                userDetails: userData, 
-                used: true, 
-                finishedAt: new Date().toISOString()
+                userDetails: userData, used: true, finishedAt: new Date().toISOString()
             });
-
             await emailjs.send("service_4wwl3xh", "template_7muk9at", {
                 user_name: `${userData.name} ${userData.surname}`,
                 user_email: userData.email,
@@ -249,7 +237,6 @@
                 results_summary: `D:${graph3.D}, I:${graph3.I}, S:${graph3.S}, C:${graph3.C}`,
                 word_list: adjectiveTable.map((p, i) => `${i+1}. +${p.most} / -${p.least}`).join("\n")
             });
-
             document.getElementById('final-status').innerHTML = `
                 <div style="color:var(--secondary); font-size: 50px; margin: 15px 0;">✓</div>
                 <h2>Завершено!</h2>
@@ -260,17 +247,21 @@
         }
     }
 
-    // Загрузка токена и предзаполнение имени
-    const params = new URLSearchParams(window.location.search);
-    userToken = params.get('token');
-    if(!userToken) {
-        document.getElementById('step-reg').innerHTML = "<h2>Ошибка</h2><p>Токен не найден в ссылке.</p>";
-    } else {
-        const snap = await getDoc(doc(db, "tokens", userToken));
-        if(snap.exists() && snap.data().name) {
-            document.getElementById('f-name').value = snap.data().name;
+    async function initApp() {
+        const params = new URLSearchParams(window.location.search);
+        userToken = params.get('token');
+        if(!userToken) {
+            document.getElementById('step-reg').innerHTML = "<h2>Ошибка</h2><p>Токен не найден в ссылке.</p>";
+            return;
         }
+        try {
+            const snap = await getDoc(doc(db, "tokens", userToken));
+            if(snap.exists() && snap.data().name) {
+                document.getElementById('f-name').value = snap.data().name;
+            }
+        } catch (e) { console.error("Token load error", e); }
     }
+    initApp();
 </script>
 </body>
 </html>
