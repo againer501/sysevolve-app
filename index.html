@@ -158,16 +158,14 @@
                     <h3>Профиль Личности DISC</h3>
                     <h4>Добро пожаловать</h4>
                     <p>Профиль Личности DISC создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
-                    <p><b>Это не тест.</b> Здесь нет 'правильных' или 'неправильных' ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах в работе и дают полезную информацию, которая поможет Вам лучше соответствовать требованиям рабочей среды.</p>
-                    <p>Первый ответ, который приходит в голову, как правило, является самым точным. Анкету необходимо заполнять в одиночестве и не отвлекаясь. Постарайтесь отвечать откровенно и честно.</p>
-                    <p>При заполнении анкеты <b>думайте о себе на текущей работе</b>; если Вы не работаете, думайте о себе на последнем месте работы. Если никогда не работали — о себе дома.</p>
+                    <p><b>Это не тест.</b> Здесь нет 'правильных' или 'неправильных' ответов.</p>
+                    <p>Первый ответ, который приходит в голову, как правило, является самым точным.</p>
                     
                     <h4>Инструкция</h4>
                     <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
                         <ol class="instr-list" style="margin:0;">
                             <li>В каждой группе выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
                             <li>Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
-                            <li>Нажмите кнопку «Далее» для перехода к следующей группе.</li>
                         </ol>
                     </div>
                 </div>
@@ -180,16 +178,25 @@
 
     window.select = (idx, type) => {
         if(!choices[currentIdx]) choices[currentIdx] = {};
-        choices[currentIdx][type] = questions[currentIdx].options[idx].v;
+        
+        // Сохраняем и фактор (v), и само слово (t)
+        const selectedOption = questions[currentIdx].options[idx];
+        choices[currentIdx][type] = {
+            factor: selectedOption.v,
+            text: selectedOption.t
+        };
+
         const group = type === 'plus' ? 'p-' : 'm-';
         for(let i=0; i<4; i++) {
             const el = document.getElementById(group+i);
             if(el) el.classList.remove('active');
         }
         document.getElementById(group+idx).classList.add('active');
+        
         const btn = document.getElementById('next-btn');
         if(choices[currentIdx].plus && choices[currentIdx].minus) {
-            btn.disabled = (choices[currentIdx].plus === choices[currentIdx].minus);
+            // Нельзя выбирать одно и то же слово и в плюс, и в минус
+            btn.disabled = (choices[currentIdx].plus.text === choices[currentIdx].minus.text);
         }
     };
 
@@ -232,9 +239,21 @@
         const graph2 = { D: 0, I: 0, S: 0, C: 0 };
         const graph3 = { D: 0, I: 0, S: 0, C: 0 };
         
+        // Массив для хранения выбранных слов (для таблицы)
+        const adjectiveTable = [];
+
         choices.forEach(c => {
-            if(c.plus) graph1[c.plus]++;
-            if(c.minus) graph2[c.minus]++;
+            if(c.plus) {
+                graph1[c.plus.factor]++;
+            }
+            if(c.minus) {
+                graph2[c.minus.factor]++;
+            }
+            // Формируем список пар слов
+            adjectiveTable.push({
+                most: c.plus ? c.plus.text : "",
+                least: c.minus ? c.minus.text : ""
+            });
         });
 
         for(let k in graph3) { graph3[k] = graph1[k] - graph2[k]; }
@@ -242,6 +261,7 @@
         try {
             await updateDoc(doc(db, "tokens", userToken), { 
                 results: { graph1, graph2, graph3 },
+                selectedAdjectives: adjectiveTable, // ТЕ САМЫЕ СЛОВА ДЛЯ ТАБЛИЦЫ
                 userDetails: userData, 
                 used: true, 
                 finishedAt: new Date().toISOString() 
