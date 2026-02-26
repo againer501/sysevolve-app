@@ -18,21 +18,22 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
-        .brand-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .brand-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; position: relative; }
         .brand-logo-img { max-height: 55px; width: auto; display: block; margin: 0 auto 12px; }
-        .alt-logo-text { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 10px; display: block; }
+        .alt-logo-text { font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 10px; display: block; }
         .brand-title { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
         h2 { font-size: 20px; color: var(--primary); margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
-        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; display: block; text-decoration: none; }
+        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; transition: border-color 0.2s; }
+        input:focus { border-color: var(--primary); }
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
         .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         .word-grid { display: grid; gap: 8px; }
         .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
-        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -94,10 +95,13 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
-    // Хедер: сначала пробует logo.jpg, если нет — показывает текст
+    // Хедер: используем прямую ссылку на logo.jpg из вашего репозитория
     const headerHTML = `
         <header class="brand-header">
-            <img src="logo.jpg" alt="SYSEVOLVE" class="brand-logo-img" onerror="this.style.display='none'; document.getElementById('alt-logo').style.display='block';">
+            <img src="https://raw.githubusercontent.com/againer501/sysevolve-app/main/logo.jpg" 
+                 alt="SYSEVOLVE" 
+                 class="brand-logo-img" 
+                 onerror="this.style.display='none'; document.getElementById('alt-logo').style.display='block';">
             <span id="alt-logo" class="alt-logo-text" style="display:none;">GLOBAL CENTER OF SYSTEMS EVOLVING</span>
             <div class="brand-title">Профиль Личности DISC</div>
         </header>
@@ -109,7 +113,7 @@
         if (!userToken) return showError("Токен отсутствует.");
         try {
             const snap = await getDoc(doc(db, "tokens", userToken));
-            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
+            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна или уже использована.");
             renderForm(snap.data().name);
         } catch (e) { showError("Ошибка сети."); }
     }
@@ -218,11 +222,11 @@
                     ${headerHTML}
                     <div style="color:var(--secondary); font-size: 60px;">✓</div>
                     <h2>Тест завершен!</h2>
-                    <p>Результаты сохранены и отправлены администратору.</p>
+                    <p>Результаты успешно отправлены администратору. Спасибо!</p>
                 </div>`;
         } catch (e) {
             console.error(e);
-            showError("Ошибка при сохранении данных.");
+            showError("Ошибка при сохранении.");
         }
     }
 
