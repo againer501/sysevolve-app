@@ -9,7 +9,6 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function(){
-            // Ваш Public Key
             emailjs.init("OhvDHzB8R3Zxdh9Q7");
         })();
     </script>
@@ -19,20 +18,20 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; padding: 20px 15px; box-sizing: border-box; }
         .container { width: 100%; max-width: 600px; }
         .card { background: white; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); text-align: center; }
-        .brand-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
-        .brand-logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto 10px; }
-        .brand-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .brand-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .brand-logo-img { max-height: 55px; width: auto; display: block; margin: 0 auto 12px; }
+        .brand-title { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
         h2 { font-size: 20px; color: var(--primary); margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #64748b; }
         input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; display: block; text-decoration: none; }
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; display: block; text-decoration: none; border: none; }
         .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         .word-grid { display: grid; gap: 8px; }
-        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; }
-        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .word-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+        .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -42,7 +41,7 @@
 <body>
 
 <div id="app" class="container">
-    <div class="card"><div class="loader"></div><p>Загрузка системы...</p></div>
+    <div class="card"><div class="loader"></div><p>Загрузка...</p></div>
 </div>
 
 <script type="module">
@@ -94,9 +93,13 @@
     let choices = [];
     const appDiv = document.getElementById('app');
 
+    // Исправленный блок хедера с надежной ссылкой на логотип
     const headerHTML = `
         <header class="brand-header">
-            <img src="https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media" class="brand-logo-img">
+            <img src="https://firebasestorage.googleapis.com/v0/b/sysevolve-platform.appspot.com/o/public%2Flogo.png?alt=media" 
+                 alt="SYSEVOLVE" 
+                 class="brand-logo-img"
+                 onerror="this.src='https://via.placeholder.com/200x50?text=SYSEVOLVE';">
             <div class="brand-title">Профиль Личности DISC</div>
         </header>
     `;
@@ -104,12 +107,12 @@
     async function init() {
         const params = new URLSearchParams(window.location.search);
         userToken = params.get('token');
-        if (!userToken) return showError("Токен отсутствует.");
+        if (!userToken) return showError("Токен отсутствует в ссылке.");
         try {
             const snap = await getDoc(doc(db, "tokens", userToken));
-            if (!snap.exists() || snap.data().used) return showError("Ссылка недействительна.");
+            if (!snap.exists() || snap.data().used) return showError("Эта ссылка уже была использована или недействительна.");
             renderForm(snap.data().name);
-        } catch (e) { showError("Ошибка сети."); }
+        } catch (e) { showError("Ошибка подключения к серверу."); }
     }
 
     function renderForm(dbName) {
@@ -163,15 +166,16 @@
                 <div class="word-grid">
                     ${q.options.map((opt, i) => `
                         <div class="word-item">
-                            <span>${opt.t}</span>
-                            <div style="display:flex; gap:10px;">
+                            <span style="font-weight:600; color:#334155;">${opt.t}</span>
+                            <div style="display:flex; gap:12px;">
                                 <button class="btn-choice plus" id="p-${i}" onclick="window.select(${i}, 'plus')">+</button>
                                 <button class="btn-choice minus" id="m-${i}" onclick="window.select(${i}, 'minus')">-</button>
                             </div>
                         </div>
                     `).join('')}
                 </div>
-                <button id="next-btn" class="btn-main" disabled onclick="window.goNext()" style="margin-top:20px;">Далее</button>
+                <button id="next-btn" class="btn-main" disabled onclick="window.goNext()" style="margin-top:25px;">Следующий этап</button>
+                <div style="margin-top:15px; font-size:12px; color:#94a3b8;">Группа ${currentIdx+1} из 24</div>
             </div>
         `;
     }
@@ -213,17 +217,17 @@
             appDiv.innerHTML = `
                 <div class="card">
                     ${headerHTML}
-                    <div style="color:var(--secondary); font-size: 60px;">✓</div>
-                    <h2>Готово!</h2>
-                    <p>Ваши результаты сохранены и отправлены администратору. Спасибо!</p>
+                    <div style="color:var(--secondary); font-size: 60px; margin-bottom:10px;">✓</div>
+                    <h2>Тест завершен!</h2>
+                    <p style="color:#64748b; line-height:1.5;">Спасибо, <b>${userData.name}</b>! Ваши результаты успешно сохранены в базе данных и отправлены администратору.</p>
                 </div>`;
         } catch (e) {
             console.error(e);
-            showError("Ошибка при сохранении данных.");
+            showError("Произошла ошибка при сохранении данных. Пожалуйста, сообщите администратору.");
         }
     }
 
-    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Ошибка</h2><p>${m}</p></div>`; }
+    function showError(m) { appDiv.innerHTML = `<div class="card"><h2>Внимание</h2><p>${m}</p></div>`; }
     init();
 </script>
 </body>
