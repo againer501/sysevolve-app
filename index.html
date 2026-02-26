@@ -19,18 +19,24 @@
         .brand-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; }
         .brand-logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto 10px; }
         .brand-title { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        
         .step-content { display: none; }
         .step-content.active { display: block; }
+
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 13px; color: #64748b; }
         input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        
         .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 15px; text-transform: uppercase; margin-top: 10px; }
         .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; }
+
         .instr-text { text-align: left; font-size: 14px; line-height: 1.6; color: #1e293b; }
-        .instr-text h3 { color: var(--secondary); font-size: 18px; margin-bottom: 10px; font-weight: 700; }
-        .instr-text h4 { color: var(--primary); font-size: 17px; margin: 15px 0 10px 0; font-weight: 600; }
-        .instr-list { padding-left: 20px; margin: 0; }
-        .instr-list li { margin-bottom: 8px; }
+        .instr-text h3 { color: var(--secondary); font-size: 19px; margin-bottom: 15px; font-weight: 700; }
+        .instr-text p { margin-bottom: 12px; }
+        .instr-box { background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-top: 15px; }
+        .instr-list { padding-left: 20px; margin: 10px 0 0 0; }
+        .instr-list li { margin-bottom: 8px; font-weight: 500; }
+
         .progress-w { height: 6px; background: var(--border); border-radius: 10px; margin: 25px 0; overflow: hidden; }
         .progress-b { height: 100%; background: var(--secondary); transition: width 0.4s; }
         .word-grid { display: grid; gap: 8px; }
@@ -38,6 +44,7 @@
         .btn-choice { border: 1px solid var(--border); background: white; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .btn-choice.plus.active { background: #dcfce7; color: #166534; border-color: #166534; }
         .btn-choice.minus.active { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
+        
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -63,21 +70,21 @@
 
         <div id="step-instr" class="step-content">
             <div class="instr-text">
-                <h3>Профиль Личности DISC</h3>
-                <h4>Добро пожаловать</h4>
-                <p>Профиль Личности DISC создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
-                <p><b>Это не тест.</b> Здесь нет "правильных" или "неправильных" ответов.</p>
-                <p>Первый ответ, который приходит в голову, как правило, является самым точным.</p>
+                <h3>Добро пожаловать</h3>
+                <p><b>Профильный Анализ Личности</b> создан для определения предпочитаемого человеком стиля поведения в рабочей среде.</p>
+                <p>Это не тест. Здесь нет правильных или неправильных ответов. Результаты исследования акцентируют внимание на Ваших сильных сторонах в работе и дают полезную информацию, которая поможет Вам лучше соответствовать требованиям рабочей среды.</p>
+                <p>Первый ответ, который приходит Вам в голову, как правило, является самым точным. Анкету необходимо заполнять в одиночестве и не отвлекаясь. Постарайтесь отвечать спонтанно и честно.</p>
+                <p>При заполнении анкеты Профильного Анализа Личности думайте о себе на текущей работе. Если Вы не работаете, думайте о себе на последнем месте работы. Если вы никогда не работали, то — о себе дома.</p>
                 
-                <h4>Инструкция</h4>
-                <div style="background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
+                <div class="instr-box">
+                    <b style="color: var(--primary);">Инструкция:</b>
                     <ol class="instr-list">
                         <li>В каждой группе выберите слово, которое <b>НАИБОЛЕЕ (+)</b> характеризует Вас.</li>
                         <li>Затем выберите слово, которое <b>НАИМЕНЕЕ (-)</b> характеризует Вас.</li>
                     </ol>
                 </div>
             </div>
-            <button type="button" class="btn-main" style="margin-top:20px;" onclick="startQuiz()">Начать заполнение</button>
+            <button type="button" class="btn-main" style="margin-top:25px;" onclick="startQuiz()">Начать заполнение</button>
         </div>
 
         <div id="step-quiz" class="step-content">
